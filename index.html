@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>برج توان | تمرین توان و جذر</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#1B1435;
+    --bg-deep-2:#2E1F5E;
+    --cream:#FFF6E5;
+    --ink:#170F2E;
+    --teal:#3DDC97;
+    --blue:#4FA6FF;
+    --gold:#FFC145;
+    --coral:#FF5D73;
+    --violet:#B26BFF;
+    --radius-lg:24px;
+    --radius-md:16px;
+    --radius-sm:10px;
+    --font: 'Vazirmatn', sans-serif;
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{
+    margin:0; padding:0; height:100%;
+    font-family:var(--font);
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,255,255,.06), transparent 40%),
+      radial-gradient(circle at 80% 0%, rgba(255,255,255,.05), transparent 35%),
+      linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-deep-2) 100%);
+    color:var(--cream);
+    overflow:hidden;
+    user-select:none;
+    touch-action:manipulation;
+  }
+  #stars-bg{
+    position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.55;
+  }
+  #app{
+    position:relative; z-index:1;
+    height:100vh; height:100dvh;
+    width:100vw; max-width:520px; margin:0 auto;
+    display:flex; flex-direction:column;
+    padding-top:env(safe-area-inset-top);
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .screen{
+    display:none; flex-direction:column;
+    height:100%; min-height:0;
+    padding:14px 16px 12px;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    animation:fadeIn .35s ease;
+  }
+  .screen.active{ display:flex; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+  h1,h2,h3{ margin:0; font-weight:800; }
+  p{ margin:0; }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; position:relative; }
+  .logo{ display:flex; align-items:center; gap:8px; }
+  .logo-badge{ font-size:26px; filter:drop-shadow(0 2px 6px rgba(0,0,0,.4)); }
+  .logo-text{ font-size:20px; font-weight:900; letter-spacing:.5px; }
+  .logo-text small{ display:block; font-size:11px; font-weight:500; opacity:.7; }
+  .coin-pill{
+    display:flex; align-items:center; gap:6px;
+    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14);
+    padding:7px 12px; border-radius:999px; font-weight:800; font-size:14px;
+  }
+  .music-toggle{
+    width:36px; height:36px; border-radius:50%;
+    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18);
+    color:var(--cream); font-size:15px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    margin-left:6px;
+    transition:transform .1s ease;
+  }
+  .music-toggle:active{ transform:scale(.9); }
+  .tower-wrap{ position:relative; flex:1; overflow-y:auto; padding:10px 4px 6px; }
+  .tower-path{ position:relative; display:flex; flex-direction:column-reverse; gap:6px; padding:10px 6px 100px; min-height:100%; }
+  .tower-path::before{
+    content:""; position:absolute; top:20px; bottom:80px; right:50%;
+    width:4px; background:repeating-linear-gradient(180deg, rgba(255,255,255,.35) 0 10px, transparent 10px 20px);
+    transform:translateX(50%); z-index:0; border-radius:4px;
+  }
+  .level-node{ position:relative; z-index:1; display:flex; align-items:center; gap:14px; margin:14px 0; }
+  .level-node.side-a{ justify-content:flex-start; }
+  .level-node.side-b{ justify-content:flex-end; }
+  .node-btn{
+    width:76px; height:76px; border-radius:22px; border:none; cursor:pointer;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+    font-family:var(--font); color:var(--ink); font-weight:900; font-size:22px;
+    box-shadow:0 8px 0 rgba(0,0,0,.25), 0 10px 18px rgba(0,0,0,.35);
+    transition:transform .12s ease;
+    position:relative;
+  }
+  .node-btn:active{ transform:translateY(6px); box-shadow:0 2px 0 rgba(0,0,0,.25), 0 4px 10px rgba(0,0,0,.3); }
+  .node-btn.locked{ background:#3a3560; color:rgba(255,255,255,.45); box-shadow:0 8px 0 rgba(0,0,0,.2); cursor:not-allowed; }
+  .node-btn .stars-row{ font-size:11px; letter-spacing:1px; }
+  .node-label{ background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); border-radius:var(--radius-md);
+     padding:8px 12px; max-width:170px; }
+  .node-label b{ display:block; font-size:14px; color:var(--cream); }
+  .node-label span{ font-size:11px; opacity:.9; color:var(--cream); }
+  .avatar-flag{ position:absolute; font-size:28px; transform:translateY(-58px); animation:bob 1.6s ease-in-out infinite; }
+  @keyframes bob{ 0%,100%{transform:translateY(-58px);} 50%{transform:translateY(-64px);} }
+  .menu-footer{ display:flex; gap:10px; margin-top:8px; }
+  .btn{
+    font-family:var(--font); border:none; cursor:pointer; border-radius:var(--radius-md);
+    font-weight:800; font-size:15px; padding:14px 16px; display:flex; align-items:center; justify-content:center; gap:8px;
+    transition:transform .1s ease, filter .15s ease; color:var(--ink);
+  }
+  .btn:active{ transform:scale(.96); }
+  .btn-primary{ background:linear-gradient(180deg, var(--gold), #E9A400); box-shadow:0 6px 0 #a86f00, 0 8px 16px rgba(0,0,0,.35); }
+  .btn-ghost{ background:rgba(255,255,255,.08); color:var(--cream); border:1px solid rgba(255,255,255,.18); box-shadow:none; }
+  .btn-full{ width:100%; }
+  .btn-channel{
+    background:linear-gradient(180deg, var(--blue), #2C7FDB); color:#fff;
+    box-shadow:0 6px 0 #1f5da3, 0 8px 16px rgba(0,0,0,.35);
+  }
+  .credit-line{
+    text-align:center; font-size:11px; opacity:.55; margin-top:10px; flex-shrink:0;
+    padding-bottom:2px;
+  }
+  .shop-grid{ display:flex; flex-direction:column; gap:10px; margin-top:14px; overflow-y:auto; }
+  .skin-card{ background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:var(--radius-md);
+    padding:12px 14px; display:flex; gap:12px; align-items:flex-start; cursor:pointer; position:relative; }
+  .skin-emoji{ font-size:32px; flex-shrink:0; align-self:center; }
+  .skin-info{ display:flex; flex-direction:column; gap:4px; min-width:0; }
+  .skin-card.selected{ border-color:var(--teal); box-shadow:0 0 0 2px var(--teal) inset; }
+  .skin-ability{ font-size:12px; color:var(--gold); font-weight:700; }
+  .passive-tag{ font-size:10px; background:rgba(255,193,69,.18); border:1px solid rgba(255,193,69,.4); border-radius:999px; padding:1px 6px; color:var(--gold); }
+  .skin-desc{ font-size:11.5px; opacity:.9; line-height:1.6; color:var(--cream); }
+  .skin-cost{ font-size:12px; opacity:.9; font-weight:700; color:var(--cream); }
+  .intro-card{ margin:auto 0; text-align:center; display:flex; flex-direction:column; gap:14px; align-items:center; }
+  .intro-emoji{ font-size:54px; }
+  .intro-tip{ background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); border-radius:var(--radius-md);
+    padding:14px; font-size:14px; line-height:1.9; color:var(--cream); }
+  .intro-tip b{ color:var(--gold); }
+  #screen-game{ display:none; }
+  #screen-game.active{ display:flex; }
+  .game-header{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; flex-shrink:0; }
+  .icon-btn{
+    width:38px; height:38px; border-radius:12px; border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.08); color:var(--cream); font-size:17px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .icon-btn:active{ transform:scale(.92); }
+  .header-right{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
+  .hearts{ display:flex; gap:4px; font-size:20px; flex-shrink:0; }
+  .ability-bar{
+    display:flex; align-items:center; gap:10px; width:100%; text-align:right;
+    background:linear-gradient(90deg, rgba(255,193,69,.16), rgba(255,193,69,.05));
+    border:1px solid rgba(255,193,69,.35); border-radius:var(--radius-md);
+    padding:9px 12px; margin-bottom:10px; cursor:pointer; font-family:var(--font);
+    flex-shrink:0; transition:transform .1s ease, opacity .2s, background .2s, border-color .2s;
+  }
+  .ability-bar:active{ transform:scale(.97); }
+  .ability-emoji{ font-size:26px; flex-shrink:0; }
+  .ability-text{ display:flex; flex-direction:column; gap:1px; }
+  .ability-text b{ font-size:13px; color:var(--gold); }
+  .ability-text span{ font-size:11px; opacity:.9; color:var(--cream); }
+  .ability-bar.used{ opacity:.5; cursor:default; background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.14); }
+  .ability-bar.used .ability-text b{ color:var(--cream); }
+  .ability-bar.passive{ cursor:default; }
+  .ability-bar.passive:active{ transform:none; }
+  .master-abilities{
+    display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; justify-content:center;
+    background:rgba(255,193,69,.08); border:1px solid rgba(255,193,69,.2); border-radius:var(--radius-md);
+    padding:8px 10px; flex-shrink:0;
+  }
+  .master-ability-btn{
+    font-family:var(--font); border:1px solid rgba(255,255,255,.2); border-radius:var(--radius-sm);
+    background:rgba(255,255,255,.08); color:var(--cream); padding:6px 10px; font-size:12px; font-weight:700;
+    cursor:pointer; display:flex; align-items:center; gap:4px; transition:all .15s;
+    flex:1 0 auto; max-width:120px; justify-content:center;
+  }
+  .master-ability-btn:active{ transform:scale(.95); }
+  .master-ability-btn.used{ opacity:.4; cursor:default; filter:grayscale(1); }
+  .master-ability-btn .emoji{ font-size:16px; }
+  .toast{
+    position:absolute; top:10px; left:50%; transform:translateX(-50%) translateY(-10px);
+    background:rgba(23,15,46,.96); border:1px solid rgba(255,255,255,.2); color:var(--cream);
+    padding:9px 16px; border-radius:999px; font-size:12.5px; font-weight:700;
+    opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; z-index:80;
+    white-space:nowrap; max-width:90%; text-overflow:ellipsis; overflow:hidden;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  .heart.lost{ filter:grayscale(1) opacity:.3; }
+  .combo-badge{ font-size:13px; font-weight:800; background:rgba(255,193,69,.18); color:var(--gold);
+     border:1px solid rgba(255,193,69,.4); border-radius:999px; padding:4px 10px; opacity:0; transition:opacity .2s; }
+  .combo-badge.show{ opacity:1; }
+  .progress-dots{ display:flex; gap:5px; margin-bottom:12px; justify-content:center; flex-wrap:wrap; flex-shrink:0; }
+  .dot{ width:9px; height:9px; border-radius:50%; background:rgba(255,255,255,.18); transition:.2s; }
+  .dot.correct{ background:var(--teal); }
+  .dot.wrong{ background:var(--coral); }
+  .dot.current{ box-shadow:0 0 0 3px rgba(255,255,255,.25); }
+  .timer-track{ height:10px; border-radius:999px; background:rgba(255,255,255,.1); overflow:hidden; margin-bottom:14px; flex-shrink:0; }
+  .timer-fill{ height:100%; border-radius:999px; background:linear-gradient(90deg, var(--teal), var(--gold)); width:100%; transition:width .1s linear, background .3s; }
+  .question-card{
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); border-radius:var(--radius-lg);
+    padding:20px 16px; text-align:center; margin-bottom:14px; min-height:80px;
+    display:flex; align-items:center; justify-content:center;
+    flex:1 1 auto; min-height:0;
+  }
+  .question-text{ font-size:30px; font-weight:900; letter-spacing:.5px; direction:ltr; unicode-bidi:isolate; color:var(--cream); }
+  .question-text sup{ font-size:.55em; position:relative; top:-.6em; }
+  .question-sub{ font-size:13px; opacity:.85; margin-top:6px; display:block; direction:rtl; color:var(--cream); }
+  .stage-badge{
+    align-self:flex-start; font-size:11px; font-weight:800; padding:4px 10px; border-radius:999px;
+    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.16); color:var(--cream);
+    margin-bottom:6px; flex-shrink:0;
+  }
+  .stage-badge.stage-1{ color:var(--teal); border-color:var(--teal); background:rgba(61,220,151,.12); }
+  .stage-badge.stage-2{ color:var(--gold); border-color:var(--gold); background:rgba(255,193,69,.12); }
+  .stage-badge.stage-3{ color:var(--coral); border-color:var(--coral); background:rgba(255,93,115,.12); }
+  .options-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; flex-shrink:0; }
+  .opt-btn{
+    font-family:var(--font); font-size:18px; font-weight:800; color:var(--cream);
+    background:rgba(255,255,255,.07); border:2px solid rgba(255,255,255,.16); border-radius:var(--radius-md);
+    padding:16px 8px; cursor:pointer; transition:transform .1s ease, background .15s, border-color .15s;
+    direction:ltr; min-height:56px;
+  }
+  .opt-btn:active{ transform:scale(.96); }
+  .opt-btn.correct{ background:rgba(61,220,151,.22); border-color:var(--teal); color:var(--teal); }
+  .opt-btn.wrong{ background:rgba(255,93,115,.22); border-color:var(--coral); color:var(--coral); animation:shake .35s; }
+  .opt-btn[disabled]{ cursor:default; }
+  @keyframes shake{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-6px);} 75%{transform:translateX(6px);} }
+  .coin-fly{
+    position:fixed; z-index:200; pointer-events:none;
+    font-size:28px;
+    transition: all .7s cubic-bezier(.34,1.2,.64,1);
+    opacity:1;
+  }
+  .coin-fly.fly-end{ opacity:0; transform:scale(0.2) translateY(20px); }
+  @keyframes coinLandPulse{
+    0%{ box-shadow:0 0 0 0 rgba(255,193,69,0); }
+    30%{ box-shadow:0 0 0 8px rgba(255,193,69,.35); transform:scale(1.04); }
+    100%{ box-shadow:0 0 0 0 rgba(255,193,69,0); transform:scale(1); }
+  }
+  .skin-card.coin-received{ animation:coinLandPulse .6s ease; border-color:var(--gold); }
+  .particle{ position:fixed; z-index:50; pointer-events:none; font-size:20px; animation:floatUp 900ms ease-out forwards; }
+  @keyframes floatUp{ 0%{ transform:translateY(0) scale(1); opacity:1;} 100%{ transform:translateY(-90px) scale(1.3); opacity:0;} }
+  .result-wrap{ margin:auto 0; text-align:center; display:flex; flex-direction:column; gap:14px; align-items:center; }
+  .stars-big{ font-size:42px; letter-spacing:6px; }
+  .stat-row{ display:flex; gap:10px; }
+  .stat-chip{ background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); border-radius:var(--radius-md);
+     padding:10px 14px; font-size:14px; font-weight:700; min-width:84px; color:var(--cream); }
+  .stat-chip span{ display:block; font-size:20px; margin-top:2px; }
+  .actions-col{ display:flex; flex-direction:column; gap:10px; width:100%; margin-top:6px; }
+  .fa-num{ font-feature-settings:"tnum"; }
+  @media (max-height:700px){
+    .screen{ padding:10px 14px 8px; }
+    .question-card{ padding:14px 12px; min-height:60px; }
+    .question-text{ font-size:24px; }
+    .opt-btn{ padding:12px 8px; font-size:16px; min-height:48px; }
+    .node-btn{ width:64px; height:64px; font-size:18px; }
+    .intro-emoji{ font-size:40px; }
+  }
+  @media (max-height:600px){
+    .question-text{ font-size:20px; }
+    .opt-btn{ min-height:42px; font-size:15px; }
+    .timer-track{ margin-bottom:8px; }
+    .progress-dots{ margin-bottom:8px; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+  }
+</style>
+</head>
+<body>
+<canvas id="stars-bg"></canvas>
+<div id="app">
+<div id="toast" class="toast"></div>
+  <section class="screen active" id="screen-menu">
+    <div class="topbar">
+      <div class="logo">
+        <button class="music-toggle" id="music-toggle" title="قطع/پخش آهنگ پس‌زمینه">🔊</button>
+        <div class="logo-badge">🗼</div>
+        <div class="logo-text">برج توان<small>تمرین توان و جذر</small></div>
+      </div>
+      <div class="coin-pill">🪙 <span id="coin-count" class="fa-num">۰</span></div>
+    </div>
+    <div class="tower-wrap">
+      <div class="tower-path" id="tower-path"></div>
+    </div>
+    <div class="menu-footer">
+      <button class="btn btn-ghost btn-full" id="btn-shop">🎭 فروشگاه شخصیت</button>
+    </div>
+    <div class="menu-footer">
+      <button class="btn btn-channel btn-full" id="btn-channel">📣 عضویت در کانال ریاضی بازی</button>
+    </div>
+    <div class="credit-line">طراحی شده توسط ف.شیخانی</div>
+  </section>
+  <section class="screen" id="screen-shop">
+    <div class="topbar">
+      <div class="logo">
+        <button class="music-toggle" id="music-toggle-shop" style="margin-left:6px;">🔊</button>
+        <h2 style="font-size:18px;">فروشگاه</h2>
+      </div>
+      <div class="coin-pill">🪙 <span id="coin-count-2" class="fa-num">۰</span></div>
+    </div>
+    <div class="shop-grid" id="shop-grid"></div>
+    <div class="menu-footer" style="margin-top:16px;">
+      <button class="btn btn-ghost btn-full" id="btn-shop-back">بازگشت</button>
+    </div>
+  </section>
+  <section class="screen" id="screen-intro">
+    <div class="topbar">
+      <div class="logo">
+        <button class="music-toggle" id="music-toggle-intro" style="margin-left:6px;">🔊</button>
+        <h2 id="intro-title" style="font-size:18px;">سطح</h2>
+      </div>
+      <div></div>
+    </div>
+    <div class="intro-card">
+      <div class="intro-emoji" id="intro-emoji">🚀</div>
+      <h3 id="intro-sub"></h3>
+      <div class="intro-tip" id="intro-tip"></div>
+    </div>
+    <div class="actions-col">
+      <button class="btn btn-primary btn-full" id="btn-start-level">شروع سطح</button>
+      <button class="btn btn-ghost btn-full" id="btn-intro-back">بازگشت به نقشه</button>
+    </div>
+  </section>
+  <section class="screen" id="screen-game">
+    <div class="game-header">
+      <div class="header-right">
+        <button class="icon-btn" id="btn-game-home" title="بازگشت به صفحه اصلی">🏠</button>
+        <div class="hearts" id="hearts-row"></div>
+      </div>
+      <div class="combo-badge" id="combo-badge">🔥 ترکیب ×۲</div>
+      <div class="header-right">
+        <button class="music-toggle" id="music-toggle-game" title="قطع/پخش آهنگ پس‌زمینه">🔊</button>
+        <div class="coin-pill">🪙 <span id="coin-count-3" class="fa-num">۰</span></div>
+      </div>
+    </div>
+    <div id="ability-bar-container">
+      <button class="ability-bar" id="ability-btn">
+        <span class="ability-emoji" id="ability-emoji">🚀</span>
+        <span class="ability-text">
+          <b id="ability-name">شتاب زمانی</b>
+          <span id="ability-state">برای استفاده ضربه بزن</span>
+        </span>
+      </button>
+    </div>
+    <div id="master-abilities-container" class="master-abilities" style="display:none;"></div>
+    <div class="stage-badge" id="stage-badge"></div>
+    <div class="progress-dots" id="progress-dots"></div>
+    <div class="timer-track"><div class="timer-fill" id="timer-fill"></div></div>
+    <div class="question-card">
+      <div>
+        <div class="question-text" id="question-text">۲²</div>
+        <span class="question-sub" id="question-sub">مقدار عبارت زیر را پیدا کن</span>
+      </div>
+    </div>
+    <div class="options-grid" id="options-grid"></div>
+  </section>
+  <section class="screen" id="screen-stage-result">
+    <div class="result-wrap">
+      <div style="font-size:54px;">🏁</div>
+      <h2 id="stage-result-title">مرحله ۱ تموم شد!</h2>
+      <div class="stat-row">
+        <div class="stat-chip">درست<span class="fa-num" id="stage-result-correct">۰</span></div>
+        <div class="stat-chip">امتیاز<span class="fa-num" id="stage-result-score">۰</span></div>
+        <div class="stat-chip">سکه<span class="fa-num" id="stage-result-coins">۰</span></div>
+      </div>
+      <p id="stage-result-note" style="opacity:.9; font-size:14px; margin-top:6px;">مرحله بعدی یه‌کم سخت‌تره، آماده‌ای؟</p>
+    </div>
+    <div class="actions-col">
+      <button class="btn btn-primary btn-full" id="btn-stage-continue">بزن بریم مرحله بعد!</button>
+      <button class="btn btn-ghost btn-full" id="btn-stage-menu">نقشه برج</button>
+    </div>
+  </section>
+  <section class="screen" id="screen-result">
+    <div class="result-wrap">
+      <div id="result-emoji" style="font-size:54px;">🎉</div>
+      <h2 id="result-title">سطح کامل شد!</h2>
+      <div class="stars-big" id="result-stars">⭐⭐⭐</div>
+      <div class="stat-row">
+        <div class="stat-chip">درست<span class="fa-num" id="result-correct">۰</span></div>
+        <div class="stat-chip">امتیاز<span class="fa-num" id="result-score">۰</span></div>
+        <div class="stat-chip">سکه<span class="fa-num" id="result-coins">۰</span></div>
+      </div>
+    </div>
+    <div class="actions-col">
+      <button class="btn btn-primary btn-full" id="btn-result-next">سطح بعد</button>
+      <button class="btn btn-ghost btn-full" id="btn-result-retry">تلاش دوباره</button>
+      <button class="btn btn-ghost btn-full" id="btn-result-menu">نقشه برج</button>
+    </div>
+  </section>
+  <section class="screen" id="screen-gameover">
+    <div class="result-wrap">
+      <div style="font-size:54px;">💫</div>
+      <h2>جانت تموم شد!</h2>
+      <p style="opacity:.9; font-size:14px;">نگران نباش، دوباره تلاش کن. توان و جذر با تمرین راحت میشه 💪</p>
+    </div>
+    <div class="actions-col">
+      <button class="btn btn-primary btn-full" id="btn-over-retry">تلاش دوباره</button>
+      <button class="btn btn-ghost btn-full" id="btn-over-menu">نقشه برج</button>
+    </div>
+  </section>
+</div>
+<script>
+(function(){
+"use strict";
+const FA_DIGITS = ['۰','۱','۲','۳','۴','۵','۶','۷','۸','۹'];
+function toFa(input){
+  return String(input).replace(/[0-9]/g, d => FA_DIGITS[d]);
+}
+function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function pick(arr){ return arr[rand(0, arr.length-1)]; }
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){ const j = rand(0,i); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+const SAVE_KEY = 'borjTavan_save_v1';
+function defaultSave(){
+  return { unlocked:1, stars:{1:0,2:0,3:0,4:0,5:0}, coins:0, skin:0, owned:[0], musicOn:true };
+}
+function loadSave(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(!raw) return defaultSave();
+    const parsed = JSON.parse(raw);
+    return Object.assign(defaultSave(), parsed);
+  }catch(e){ return defaultSave(); }
+}
+function writeSave(){
+  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }catch(e){}
+}
+let save = loadSave();
+
+let audioCtx = null;
+function ensureAudio(){ if(!audioCtx){ try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } }
+function tone(freq, dur, type, gainVal, delay){
+  if(!audioCtx) return;
+  const t0 = audioCtx.currentTime + (delay||0);
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type||'sine';
+  osc.frequency.setValueAtTime(freq, t0);
+  gain.gain.setValueAtTime(0, t0);
+  gain.gain.linearRampToValueAtTime(gainVal||0.15, t0+0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(t0); osc.stop(t0+dur+0.02);
+}
+const sfx = {
+  correct(){ tone(660,0.12,'triangle',0.18,0); tone(880,0.15,'triangle',0.16,0.08); },
+  wrong(){ tone(220,0.25,'sawtooth',0.14,0); tone(160,0.3,'sawtooth',0.12,0.05); },
+  levelup(){ [523,659,784,1046].forEach((f,i)=>tone(f,0.18,'triangle',0.15,i*0.09)); },
+  gameover(){ tone(300,0.3,'sawtooth',0.12,0); tone(200,0.35,'sawtooth',0.12,0.1); tone(140,0.4,'sawtooth',0.12,0.2); },
+  tap(){ tone(440,0.06,'square',0.06,0); },
+  coin(){ tone(880,0.08,'square',0.1,0); tone(1100,0.08,'square',0.1,0.07); },
+  coinJingle(){
+    [988,1245,1568,1976].forEach((f,i)=>tone(f,0.14,'triangle',0.13,i*0.075));
+    tone(2093,0.22,'sine',0.1,0.28);
+  }
+};
+let musicGain = null;
+let musicStarted = false;
+let musicTimer = null;
+const MUSIC_ARP    = [220.00,261.63,293.66,329.63,392.00,329.63,293.66,261.63];
+const MUSIC_BASS   = [110.00, null, 130.81, null, 146.83, null, 130.81, null];
+const MUSIC_STEP_S = 0.55;
+function playMusicNote(freq, dur, t0, peak, wave){
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type = wave;
+  osc.frequency.setValueAtTime(freq, t0);
+  g.gain.setValueAtTime(0, t0);
+  g.gain.linearRampToValueAtTime(peak, t0+0.06);
+  g.gain.exponentialRampToValueAtTime(0.0008, t0+dur);
+  osc.connect(g); g.connect(musicGain);
+  osc.start(t0); osc.stop(t0+dur+0.03);
+}
+function scheduleMusicStep(i){
+  if(!audioCtx || !musicGain) return;
+  const t0 = audioCtx.currentTime + 0.02;
+  playMusicNote(MUSIC_ARP[i % MUSIC_ARP.length], MUSIC_STEP_S*0.9, t0, 1, 'sine');
+  const bassFreq = MUSIC_BASS[i % MUSIC_BASS.length];
+  if(bassFreq) playMusicNote(bassFreq, MUSIC_STEP_S*1.6, t0, 0.7, 'triangle');
+  musicTimer = setTimeout(() => scheduleMusicStep(i+1), MUSIC_STEP_S*1000);
+}
+function applyMusicVolume(){
+  if(musicGain) musicGain.gain.value = save.musicOn ? 0.5 : 0;
+}
+function startMusicLoop(){
+  if(!audioCtx || musicStarted) return;
+  musicStarted = true;
+  musicGain = audioCtx.createGain();
+  musicGain.gain.value = save.musicOn ? 0.5 : 0;
+  musicGain.connect(audioCtx.destination);
+  scheduleMusicStep(0);
+}
+function armMusicAutostart(){
+  const starter = () => {
+    ensureAudio();
+    if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    startMusicLoop();
+  };
+  window.addEventListener('pointerdown', starter, { once:true });
+}
+
+const LEVELS = [
+  { id:1, title:'سطح ۱ — پله‌های آسون', short:'توان‌های ساده', emoji:'🌱', accent:'var(--teal)',
+    timer:12, count:18, minPassRatio:0.6,
+    tip:'یادت باشه: <b>n√</b> یعنی عددی که وقتی در خودش ضرب شه، n میشه. و <b>a<sup>2</sup></b> یعنی a در a ضرب میشه، نه a×۲!' },
+  { id:2, title:'سطح ۲ — پایه‌های منفی', short:'توان منفی و جذرهای بزرگ‌تر', emoji:'⚡', accent:'var(--blue)',
+    timer:11, count:18, minPassRatio:0.6,
+    tip:'وقتی پایه منفیه: اگه <b>توان زوج</b> باشه جواب مثبت میشه، اگه <b>توان فرد</b> باشه جواب منفی میشه.' },
+  { id:3, title:'سطح ۳ — جذرهای ناقص', short:'تخمین جذر', emoji:'🎯', accent:'var(--gold)',
+    timer:14, count:18, minPassRatio:0.6,
+    tip:'برای جذر ناقص، نزدیک‌ترین مجذورهای کامل قبل و بعد از عدد رو پیدا کن؛ جواب همیشه بین اون دو عدد صحیحه.' },
+  { id:4, title:'سطح ۴ — توان صفر و منفی', short:'قوانین ویژه توان', emoji:'🌀', accent:'var(--coral)',
+    timer:10, count:18, minPassRatio:0.6,
+    tip:'هر عدد به توان صفر میشه <b>۱</b>. توان منفی یعنی معکوس: <b>a<sup>-1</sup> = 1/a</b>' },
+  { id:5, title:'سطح ۵ — چالش نهایی', short:'ترکیب توان و جذر', emoji:'👑', accent:'var(--violet)',
+    timer:8, count:18, minPassRatio:0.7,
+    tip:'اول توان‌ها و جذرها رو جدا حساب کن، بعد جمع یا تفریق کن. سرعت بالا نگه دار!' }
+];
+
+// هر سطح به ۳ مرحله تقسیم می‌شود: آسون → متوسط → سخت، هر مرحله ۶ سؤال با سختی ثابتِ همان مرحله
+const STAGE_LABELS = { 1:'آسون', 2:'متوسط', 3:'سخت' };
+const STAGE_QUESTION_COUNT = 6;
+
+function numericDistractors(correct, count, spread, allowNegative = false){
+  const set = new Set([correct]);
+  const opts = [];
+  while(opts.length < count){
+    let d = correct + rand(-spread, spread);
+    if(!allowNegative && d < 0) continue;
+    if(d === correct || set.has(d)) continue;
+    set.add(d); opts.push(d);
+  }
+  return opts;
+}
+function buildNumericQuestion(promptHTML, sub, correctVal, spread, allowNegative = false){
+  const distractors = numericDistractors(correctVal, 3, spread, allowNegative);
+  const allNums = shuffle([correctVal, ...distractors]);
+  const options = allNums.map(n => toFa(n));
+  const correctIndex = allNums.indexOf(correctVal);
+  return { prompt: promptHTML, sub, options, correctIndex };
+}
+
+// هر تابع یک آرگومان stage (۱=آسون، ۲=متوسط، ۳=سخت) می‌گیرد تا سختیِ سؤال داخل خودِ سطح افزایش پیدا کند
+function genLevel1(stage = 1){
+  const type = pick(['power','root']);
+  if(type === 'power'){
+    // مرحله ۱: پایه ۱ تا ۹، فقط توان دو
+    // مرحله ۲: پایه‌ها بالای ۱۰ هم اضافه می‌شن، دیگه اعداد تا ۵ نیستن
+    // مرحله ۳: توان سه هم اضافه می‌شه
+    const base = stage === 1 ? rand(1,9) : rand(6,14);
+    const exp = stage === 3 ? pick([2,3]) : 2;
+    const val = Math.pow(base, exp);
+    const prompt = `${toFa(base)}<sup>${toFa(exp)}</sup>`;
+    const spread = stage === 1 ? 6 : stage === 2 ? 10 : 16;
+    // چون پایه مثبته، جواب همیشه مثبته؛ گزینه‌ها هم فقط مثبت می‌مونن تا جواب واضح نباشه
+    return buildNumericQuestion(prompt, 'مقدار عبارت را پیدا کن', val, spread, false);
+  } else {
+    // مرحله ۱: جواب جذر بین ۱ تا ۹
+    // مرحله ۲ و ۳: جواب جذر بالای ۱۰ هم می‌تونه باشه (دیگه اعداد تا ۵ نیستن)
+    const root = stage === 1 ? rand(1,9) : rand(6,14);
+    const val = root*root;
+    const prompt = `√${toFa(val)}`;
+    return buildNumericQuestion(prompt, 'جذر عدد را پیدا کن', root, stage === 1 ? 4 : 5);
+  }
+}
+
+// گزینه‌های متعادل: وقتی جواب می‌تونه منفی باشه (پایه منفی)، ۲ گزینه مثبت و ۲ گزینه منفی نمایش داده می‌شه
+function genLevel2(stage = 1){
+  const type = pick(['power','root']);
+  if(type === 'power'){
+    const base = stage === 1 ? -rand(2,4) : stage === 2 ? -rand(3,6) : -rand(5,9);
+    const exp = stage === 1 ? pick([2,3]) : stage === 2 ? pick([2,3]) : pick([2,3,3]);
+    const val = Math.pow(base, exp);
+    const prompt = `(${toFa(base)})<sup>${toFa(exp)}</sup>`;
+    const gap = stage === 1 ? rand(4,14) : stage === 2 ? rand(6,20) : rand(8,28);
+    // تولید گزینه‌ها: ۲ عدد مثبت و ۲ عدد منفی (به جز جواب)
+    const candidates = [];
+    const used = new Set([val]);
+    let attempts = 0;
+    while(candidates.length < 2 && attempts < 50){
+      let d = Math.abs(val) + rand(3, gap);
+      if(d > 0 && !used.has(d)){ candidates.push(d); used.add(d); }
+      attempts++;
+    }
+    attempts = 0;
+    while(candidates.length < 4 && attempts < 50){
+      let d = -Math.abs(val) - rand(3, gap);
+      if(d < 0 && !used.has(d)){ candidates.push(d); used.add(d); }
+      attempts++;
+    }
+    while(candidates.length < 3){
+      let d = val + rand(-gap,gap);
+      if(!used.has(d) && d !== 0){ candidates.push(d); used.add(d); }
+    }
+    const all = shuffle([val, ...candidates.slice(0,3)]);
+    return { prompt, sub:'مقدار عبارت را پیدا کن', options: all.map(toFa), correctIndex: all.indexOf(val) };
+  } else {
+    const root = stage === 1 ? rand(11,14) : stage === 2 ? rand(13,17) : rand(16,20);
+    const val = root*root;
+    const prompt = `√${toFa(val)}`;
+    return buildNumericQuestion(prompt, 'جذر عدد را پیدا کن', root, stage === 3 ? 3 : 4);
+  }
+}
+function genLevel3(stage = 1){
+  const range = stage === 1 ? [2,40] : stage === 2 ? [30,90] : [80,180];
+  let n;
+  do { n = rand(range[0], range[1]); } while(Number.isInteger(Math.sqrt(n)));
+  const lower = Math.floor(Math.sqrt(n));
+  const upper = lower + 1;
+  const correctText = `بین ${toFa(lower)} و ${toFa(upper)}`;
+  // بازه‌های غلطِ نزدیک به جواب درست (نه خیلی واضح، نه تکراری)
+  const offsets = shuffle([-2,-1,1,2].filter(off => lower + off >= 0));
+  const wrongPairs = offsets.slice(0,3).map(off => `بین ${toFa(lower+off)} و ${toFa(lower+off+1)}`);
+  const options = shuffle([correctText, ...wrongPairs]);
+  return {
+    prompt: `√${toFa(n)}`,
+    sub: 'این جذر بین کدام دو عدد صحیح قرار دارد؟',
+    options,
+    correctIndex: options.indexOf(correctText)
+  };
+}
+function genLevel4(stage = 1){
+  const type = stage === 1 ? pick(['zero','neg1']) : stage === 2 ? pick(['zero','neg1','neg2']) : pick(['neg1','neg2','neg2']);
+  if(type === 'zero'){
+    const base = rand(2,12);
+    const prompt = `${toFa(base)}<sup>0</sup>`;
+    const options = shuffle(['۱','۰',toFa(base), toFa(base*2)]);
+    return { prompt, sub:'قانون ویژه توان صفر رو یادت هست؟', options, correctIndex: options.indexOf('۱') };
+  } else if(type === 'neg1'){
+    const base = stage === 3 ? rand(6,12) : rand(2,9);
+    const prompt = `${toFa(base)}<sup>-1</sup>`;
+    const correct = `۱/${toFa(base)}`;
+    const options = shuffle([correct, toFa(-base), `۱/${toFa(base*2)}`, toFa(base)]);
+    return { prompt, sub:'توان منفی یعنی معکوس عدد', options, correctIndex: options.indexOf(correct) };
+  } else {
+    const base = stage === 3 ? rand(4,6) : rand(2,4);
+    const val = base*base;
+    const prompt = `${toFa(base)}<sup>-2</sup>`;
+    const correct = `۱/${toFa(val)}`;
+    const options = shuffle([correct, toFa(-val), `۱/${toFa(base)}`, toFa(val)]);
+    return { prompt, sub:'اول توان مثبتش رو حساب کن، بعد معکوس کن', options, correctIndex: options.indexOf(correct) };
+  }
+}
+function genLevel5(stage = 1){
+  const templatesBySt = {
+    1: [
+      () => { const a = rand(2,4), b = rand(1,6); const bsq=b*b; const val=a*a+b;
+        return { prompt:`${toFa(a)}<sup>2</sup> + √${toFa(bsq)}`, val, spread:8 }; },
+      () => { const b = rand(1,6); const bsq=b*b; const c = rand(2,5); const val=b*c;
+        return { prompt:`√${toFa(bsq)} × ${toFa(c)}`, val, spread:8 }; }
+    ],
+    2: [
+      () => { const a = rand(3,6), b = rand(2,8); const bsq=b*b; const val=a*a+b;
+        return { prompt:`${toFa(a)}<sup>2</sup> + √${toFa(bsq)}`, val, spread:10 }; },
+      () => { const a = rand(3,6), b = rand(2,8); const bsq=b*b; const val=a*a-b;
+        return { prompt:`${toFa(a)}<sup>2</sup> − √${toFa(bsq)}`, val, spread:10 }; },
+      () => { const base = rand(2,9); const b = rand(2,8); const bsq=b*b; const val=1+b;
+        return { prompt:`${toFa(base)}<sup>0</sup> + √${toFa(bsq)}`, val, spread:8 }; }
+    ],
+    3: [
+      () => { const a = rand(5,9), b = rand(4,10); const bsq=b*b; const val=a*a-b;
+        return { prompt:`${toFa(a)}<sup>2</sup> − √${toFa(bsq)}`, val, spread:14 }; },
+      () => { const b = rand(4,10); const bsq=b*b; const c = rand(4,9); const val=b*c;
+        return { prompt:`√${toFa(bsq)} × ${toFa(c)}`, val, spread:14 }; },
+      () => { const a = rand(4,8), b = rand(4,10); const bsq=b*b; const val=a*a+b;
+        return { prompt:`${toFa(a)}<sup>2</sup> + √${toFa(bsq)}`, val, spread:16 }; }
+    ]
+  };
+  const t = pick(templatesBySt[stage] || templatesBySt[1])();
+  // جواب این سطح همیشه مثبته، پس گزینه‌ها هم فقط مثبت می‌مونن تا حدس‌زدن با علامت ممکن نباشه
+  return buildNumericQuestion(t.prompt, 'اول توان و جذر رو جدا حساب کن', t.val, t.spread, false);
+}
+const GENERATORS = { 1:genLevel1, 2:genLevel2, 3:genLevel3, 4:genLevel4, 5:genLevel5 };
+
+const SKINS = [
+  { id:0, emoji:'🚀', name:'موشک', cost:0,
+    ability:'extra_time', abilityName:'شتاب زمانی', passive:false,
+    desc:'یک‌بار در هر سطح، ۵ ثانیه به زمان سؤال جاری اضافه می‌کند.' },
+  { id:1, emoji:'🐱', name:'گربه فضایی', cost:15,
+    ability:'fifty_fifty', abilityName:'چشم تیزبین', passive:false,
+    desc:'یک‌بار در هر سطح، دو گزینه‌ی اشتباه را حذف می‌کند.' },
+  { id:2, emoji:'🦸', name:'قهرمان', cost:30,
+    ability:'heart_restore', abilityName:'نیروی بازگشت', passive:false,
+    desc:'یک‌بار در هر سطح، یک جان از دست‌رفته را برمی‌گرداند.' },
+  { id:3, emoji:'🐉', name:'اژدها', cost:50,
+    ability:'double_coins', abilityName:'گنج اژدها', passive:true,
+    desc:'به‌صورت خودکار، تمام سکه‌های به‌دست‌آمده در هر سطح را دو برابر می‌کند.' },
+  { id:4, emoji:'🔥', name:'شراره', cost:80,
+    ability:'auto_solve', abilityName:'نفس آتش', passive:false,
+    desc:'یک‌بار در هر سطح، سؤال جاری را به‌طور کامل و خودکار حل می‌کند.' },
+  { id:5, emoji:'🧙', name:'استاد', cost:150,
+    ability:'all_abilities', abilityName:'قدرت مطلق', passive:false,
+    desc:'همه توانایی‌های شخصیت‌های قبلی را یکجا دارد: زمان اضافی، حذف گزینه، بازگشت قلب، سکه دوبرابر و حل خودکار.' }
+];
+
+const screens = {};
+document.querySelectorAll('.screen').forEach(s => screens[s.id] = s);
+function showScreen(id){
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[id].classList.add('active');
+}
+
+function renderMenu(){
+  document.getElementById('coin-count').textContent = toFa(save.coins);
+  document.getElementById('coin-count-2').textContent = toFa(save.coins);
+  const path = document.getElementById('tower-path');
+  path.innerHTML = '';
+  LEVELS.forEach((lvl, idx) => {
+    const unlocked = lvl.id <= save.unlocked;
+    const stars = save.stars[lvl.id] || 0;
+    const node = document.createElement('div');
+    node.className = 'level-node ' + (idx % 2 === 0 ? 'side-a' : 'side-b');
+    const btn = document.createElement('button');
+    btn.className = 'node-btn' + (unlocked ? '' : ' locked');
+    btn.style.background = unlocked ? lvl.accent : '';
+    btn.innerHTML = unlocked
+      ? `<div>${lvl.emoji}</div><div class="stars-row">${'⭐'.repeat(stars)}${'☆'.repeat(3-stars)}</div>`
+      : `<div>🔒</div>`;
+    if(unlocked){
+      btn.addEventListener('click', () => { sfx.tap(); openIntro(lvl.id); });
+    }
+    const label = document.createElement('div');
+    label.className = 'node-label';
+    label.innerHTML = `<b>${lvl.title}</b><span>${lvl.short}</span>`;
+    if(idx % 2 === 0){ node.appendChild(btn); node.appendChild(label); }
+    else { node.appendChild(label); node.appendChild(btn); }
+    path.appendChild(node);
+  });
+}
+
+function renderShop(){
+  document.getElementById('coin-count-2').textContent = toFa(save.coins);
+  const grid = document.getElementById('shop-grid');
+  grid.innerHTML = '';
+  SKINS.forEach(skin => {
+    const owned = save.owned.includes(skin.id);
+    const selected = save.skin === skin.id;
+    const card = document.createElement('div');
+    card.className = 'skin-card' + (selected ? ' selected' : '');
+    card.innerHTML = `
+      <div class="skin-emoji">${skin.emoji}</div>
+      <div class="skin-info">
+        <div style="font-weight:700; font-size:13px; color:var(--cream);">${skin.name}</div>
+        <div class="skin-ability">⚡ ${skin.abilityName}${skin.passive ? ' <span class="passive-tag">همیشه‌فعال</span>' : ''}</div>
+        <div class="skin-desc">${skin.desc}</div>
+        <div class="skin-cost">${owned ? (selected ? '✅ انتخاب‌شده' : 'داری، بزن انتخابش کنی') : '🪙 ' + toFa(skin.cost)}</div>
+      </div>
+    `;
+    card.addEventListener('click', (e) => {
+      sfx.tap();
+      if(owned){
+        save.skin = skin.id; writeSave(); renderShop();
+      } else if(save.coins >= skin.cost){
+        const coinPill = document.querySelector('.coin-pill');
+        const pillRect = coinPill.getBoundingClientRect();
+        const cardRect = card.getBoundingClientRect();
+        const COIN_COUNT = 4;
+        for(let i=0;i<COIN_COUNT;i++){
+          const flyer = document.createElement('div');
+          flyer.className = 'coin-fly';
+          flyer.textContent = '🪙';
+          flyer.style.left = (pillRect.left + pillRect.width/2 - 14 + rand(-4,4)) + 'px';
+          flyer.style.top = (pillRect.top + pillRect.height/2 - 14 + rand(-4,4)) + 'px';
+          document.body.appendChild(flyer);
+          const delay = i * 90;
+          setTimeout(() => {
+            requestAnimationFrame(() => {
+              flyer.style.left = (cardRect.left + cardRect.width/2 - 14 + rand(-10,10)) + 'px';
+              flyer.style.top = (cardRect.top + cardRect.height/2 - 14 + rand(-10,10)) + 'px';
+              flyer.style.transform = 'scale(0.8)';
+            });
+            setTimeout(() => {
+              flyer.classList.add('fly-end');
+              setTimeout(() => flyer.remove(), 800);
+            }, 650);
+          }, delay);
+        }
+        sfx.coinJingle();
+        save.coins -= skin.cost;
+        save.owned.push(skin.id);
+        save.skin = skin.id;
+        writeSave();
+        document.getElementById('coin-count').textContent = toFa(save.coins);
+        document.getElementById('coin-count-2').textContent = toFa(save.coins);
+        setTimeout(() => {
+          card.classList.add('coin-received');
+          setTimeout(() => {
+            card.classList.remove('coin-received');
+            renderShop();
+          }, 650);
+        }, COIN_COUNT * 90 + 600);
+      }
+    });
+    grid.appendChild(card);
+  });
+}
+
+let pendingLevel = null;
+function openIntro(levelId){
+  pendingLevel = levelId;
+  const lvl = LEVELS.find(l => l.id === levelId);
+  document.getElementById('intro-title').textContent = lvl.title;
+  document.getElementById('intro-emoji').textContent = lvl.emoji;
+  document.getElementById('intro-sub').textContent = lvl.short;
+  document.getElementById('intro-tip').innerHTML = lvl.tip +
+    '<br><br>این سطح <b>سه مرحله</b> داره: آسون ← متوسط ← سخت. آماده‌ای؟';
+  showScreen('screen-intro');
+}
+
+let session = null;
+let timerHandle = null;
+
+function startLevel(levelId){
+  try {
+    if (!levelId) levelId = pendingLevel || 1;
+    const lvl = LEVELS.find(l => l.id === levelId);
+    if (!lvl) throw new Error('سطح یافت نشد');
+    let skin = SKINS[save.skin];
+    if (!skin) {
+      skin = SKINS[0];
+      save.skin = 0;
+      writeSave();
+    }
+    ensureAudio();
+    session = {
+      level: lvl,
+      stage: 1,
+      index: 0,
+      correctCount: 0,
+      wrongCount: 0,
+      hearts: 3,
+      combo: 0,
+      score: 0,
+      coinsEarned: 0,
+      stageCorrectCount: 0,
+      stageScore: 0,
+      stageCoinsEarned: 0,
+      results: [],
+      currentQuestion: null,
+      timeLeft: lvl.timer,
+      locked: false,
+      abilityUsed: false,
+      abilitiesUsed: {
+        extra_time: false,
+        fifty_fifty: false,
+        heart_restore: false,
+        auto_solve: false
+      },
+      coinMultiplier: (skin.ability === 'double_coins' || skin.ability === 'all_abilities') ? 2 : 1,
+      usedQuestions: []
+    };
+    renderGameHeader();
+    renderAbilityBar();
+    renderDots();
+    nextQuestion();
+    showScreen('screen-game');
+  } catch(err) {
+    console.error('startLevel error:', err);
+    showToast('خطا در شروع بازی، لطفاً دوباره تلاش کنید');
+    renderMenu();
+    showScreen('screen-menu');
+  }
+}
+
+function renderGameHeader(){
+  const row = document.getElementById('hearts-row');
+  row.innerHTML = '';
+  for(let i=0;i<3;i++){
+    const span = document.createElement('span');
+    span.className = 'heart' + (i < session.hearts ? '' : ' lost');
+    span.textContent = '❤️';
+    row.appendChild(span);
+  }
+  document.getElementById('coin-count-3').textContent = toFa(save.coins + session.coinsEarned);
+  updateComboBadge();
+}
+function updateComboBadge(){
+  const badge = document.getElementById('combo-badge');
+  if(session.combo >= 2){
+    badge.classList.add('show');
+    badge.textContent = `🔥 ترکیب ×${toFa(Math.min(session.combo,5))}`;
+  } else {
+    badge.classList.remove('show');
+  }
+}
+
+function renderAbilityBar(){
+  const skin = SKINS[save.skin] || SKINS[0];
+  const isMaster = (skin.id === 5);
+  const container = document.getElementById('ability-bar-container');
+  const masterContainer = document.getElementById('master-abilities-container');
+  if (isMaster) {
+    container.style.display = 'none';
+    masterContainer.style.display = 'flex';
+    masterContainer.innerHTML = '';
+    const abilities = [
+      { id: 'extra_time', emoji: '⏱️', label: 'زمان+۵ث' },
+      { id: 'fifty_fifty', emoji: '🎯', label: '۵۰-۵۰' },
+      { id: 'heart_restore', emoji: '❤️‍🔥', label: 'بازگشت قلب' },
+      { id: 'auto_solve', emoji: '🔥', label: 'حل خودکار' }
+    ];
+    abilities.forEach(ab => {
+      const btn = document.createElement('button');
+      btn.className = 'master-ability-btn';
+      if (session.abilitiesUsed[ab.id]) {
+        btn.classList.add('used');
+        btn.disabled = true;
+      }
+      btn.dataset.ability = ab.id;
+      btn.innerHTML = `<span class="emoji">${ab.emoji}</span> ${ab.label}`;
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        useMasterAbility(ab.id);
+      });
+      masterContainer.appendChild(btn);
+    });
+  } else {
+    container.style.display = 'block';
+    masterContainer.style.display = 'none';
+    const bar = document.getElementById('ability-btn');
+    document.getElementById('ability-emoji').textContent = skin.emoji;
+    document.getElementById('ability-name').textContent = skin.abilityName;
+    const stateEl = document.getElementById('ability-state');
+    bar.classList.remove('used','passive');
+    if(skin.passive){
+      bar.classList.add('passive');
+      stateEl.textContent = 'خودکار فعاله: سکه‌های این سطح دو برابر می‌شن 🪙';
+    } else if(session.abilityUsed){
+      bar.classList.add('used');
+      stateEl.textContent = 'استفاده شد ✔️';
+    } else {
+      stateEl.textContent = 'برای استفاده ضربه بزن';
+    }
+  }
+}
+
+// ===== اصلاح قابلیت گربه: حذف دو گزینه اشتباه =====
+function useMasterAbility(abilityId){
+  if (!session || session.locked || !session.currentQuestion) return;
+  if (session.abilitiesUsed[abilityId]) {
+    showToast('این قابلیت قبلاً استفاده شده');
+    return;
+  }
+  const q = session.currentQuestion;
+  const allBtns = Array.from(document.querySelectorAll('#options-grid .opt-btn'));
+  switch (abilityId) {
+    case 'extra_time':
+      session.timerTotalMs += 5000;
+      session.abilitiesUsed.extra_time = true;
+      showToast('⏱️ ۵ ثانیه زمان اضافه شد!');
+      sfx.tap();
+      break;
+    case 'fifty_fifty': {
+      // حذف دو گزینه اشتباه
+      let wrongIndices = allBtns
+        .map((b,i) => i)
+        .filter(i => i !== q.correctIndex && !allBtns[i].classList.contains('removed'));
+      if (wrongIndices.length < 2) {
+        showToast('گزینه غلط کافی برای حذف نیست');
+        return;
+      }
+      // انتخاب تصادفی دو گزینه
+      const toRemove = [];
+      while (toRemove.length < 2) {
+        const idx = pick(wrongIndices);
+        if (!toRemove.includes(idx)) {
+          toRemove.push(idx);
+          wrongIndices = wrongIndices.filter(i => i !== idx);
+        }
+      }
+      toRemove.forEach(idx => {
+        allBtns[idx].classList.add('removed');
+        allBtns[idx].disabled = true;
+        allBtns[idx].style.opacity = '0.25';
+        allBtns[idx].innerHTML = '—';
+      });
+      session.abilitiesUsed.fifty_fifty = true;
+      showToast('🐱 دو گزینه غلط حذف شدند!');
+      sfx.tap();
+      break;
+    }
+    case 'heart_restore':
+      if (session.hearts < 3) {
+        session.hearts += 1;
+        renderGameHeader();
+        session.abilitiesUsed.heart_restore = true;
+        showToast('❤️‍🔥 یک جان برگشت!');
+        sfx.correct();
+      } else {
+        showToast('جونت کامله!');
+        return;
+      }
+      break;
+    case 'auto_solve':
+      session.abilitiesUsed.auto_solve = true;
+      showToast('🔥 نفس آتش! سؤال حل شد!');
+      const correctBtn = allBtns[q.correctIndex];
+      onAnswer(q.correctIndex, correctBtn, { isAbility: true });
+      return;
+    default:
+      return;
+  }
+  renderAbilityBar();
+}
+
+function showToast(text){
+  const t = document.getElementById('toast');
+  t.textContent = text;
+  t.classList.add('show');
+  clearTimeout(t._hideTimer);
+  t._hideTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+function renderDots(){
+  const wrap = document.getElementById('progress-dots');
+  wrap.innerHTML = '';
+  for(let i=0;i<STAGE_QUESTION_COUNT;i++){
+    const d = document.createElement('div');
+    let cls = 'dot';
+    if(session.results[i] === 'correct') cls += ' correct';
+    else if(session.results[i] === 'wrong') cls += ' wrong';
+    if(i === session.index) cls += ' current';
+    d.className = cls;
+    wrap.appendChild(d);
+  }
+}
+
+function nextQuestion(){
+  if(session.index >= STAGE_QUESTION_COUNT || session.hearts <= 0){
+    finishStage();
+    return;
+  }
+  session.locked = false;
+  const stage = session.stage;
+  let q = null;
+  let attempts = 0;
+  const maxAttempts = 200;
+  do {
+    q = GENERATORS[session.level.id](stage);
+    attempts++;
+    const key = q.prompt; // سؤال با prompt یکسان تکراری حساب می‌شه، حتی اگه ترتیب گزینه‌ها فرق کنه
+    if (!session.usedQuestions.includes(key)) {
+      session.usedQuestions.push(key);
+      break;
+    }
+  } while (attempts < maxAttempts);
+  if (!session.usedQuestions.includes(q.prompt)) session.usedQuestions.push(q.prompt);
+  session.currentQuestion = q;
+
+  const badge = document.getElementById('stage-badge');
+  badge.className = 'stage-badge stage-' + stage;
+  badge.textContent = `مرحله ${toFa(stage)} از ۳ — ${STAGE_LABELS[stage]}`;
+  document.getElementById('question-text').innerHTML = q.prompt;
+  document.getElementById('question-sub').textContent = q.sub;
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.innerHTML = opt;
+    btn.addEventListener('click', (e) => onAnswer(i, btn, e));
+    grid.appendChild(btn);
+  });
+  renderDots();
+  renderAbilityBar();
+  startTimer();
+}
+
+function startTimer(){
+  clearInterval(timerHandle);
+  session.timerTotalMs = session.level.timer * 1000;
+  session.timerStartTs = Date.now();
+  const fill = document.getElementById('timer-fill');
+  fill.style.transition = 'none';
+  fill.style.width = '100%';
+  fill.style.background = 'linear-gradient(90deg, var(--teal), var(--gold))';
+  requestAnimationFrame(() => { fill.style.transition = 'width .1s linear, background .3s'; });
+  timerHandle = setInterval(() => {
+    const elapsed = Date.now() - session.timerStartTs;
+    const pct = Math.max(0, 1 - elapsed/session.timerTotalMs);
+    fill.style.width = (pct*100) + '%';
+    if(pct < 0.3) fill.style.background = 'linear-gradient(90deg, var(--coral), var(--gold))';
+    if(pct <= 0){
+      clearInterval(timerHandle);
+      if(!session.locked) onAnswer(-1, null, null);
+    }
+  }, 50);
+}
+
+function spawnParticles(x, y, emoji, count){
+  for(let i=0;i<count;i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = emoji;
+    p.style.left = (x + rand(-30,30)) + 'px';
+    p.style.top = (y + rand(-10,10)) + 'px';
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 950);
+  }
+}
+
+// ===== اصلاح قابلیت گربه در شخصیت‌های غیر استاد =====
+function useAbility(){
+  if(!session || session.locked || !session.currentQuestion) return;
+  const skin = SKINS[save.skin] || SKINS[0];
+  if(skin.passive) return;
+  if(session.abilityUsed) return;
+  const q = session.currentQuestion;
+  const allBtns = Array.from(document.querySelectorAll('#options-grid .opt-btn'));
+  if(skin.ability === 'extra_time'){
+    session.timerTotalMs += 5000;
+    sfx.tap();
+    session.abilityUsed = true;
+    showToast('⏱️ ۵ ثانیه زمان اضافه شد!');
+  }
+  else if(skin.ability === 'fifty_fifty'){
+    // حذف دو گزینه اشتباه
+    let wrongIndices = allBtns
+      .map((b,i) => i)
+      .filter(i => i !== q.correctIndex && !allBtns[i].classList.contains('removed'));
+    if (wrongIndices.length < 2) {
+      showToast('گزینه غلط کافی برای حذف نیست');
+      return;
+    }
+    const toRemove = [];
+    while (toRemove.length < 2) {
+      const idx = pick(wrongIndices);
+      if (!toRemove.includes(idx)) {
+        toRemove.push(idx);
+        wrongIndices = wrongIndices.filter(i => i !== idx);
+      }
+    }
+    toRemove.forEach(idx => {
+      allBtns[idx].classList.add('removed');
+      allBtns[idx].disabled = true;
+      allBtns[idx].style.opacity = '0.25';
+      allBtns[idx].innerHTML = '—';
+    });
+    sfx.tap();
+    session.abilityUsed = true;
+    showToast('🐱 دو گزینه غلط حذف شدند!');
+  }
+  else if(skin.ability === 'heart_restore'){
+    if(session.hearts < 3){
+      session.hearts += 1;
+      renderGameHeader();
+      sfx.correct();
+      session.abilityUsed = true;
+      showToast('🦸 یک جان برگشت!');
+    } else {
+      showToast('جونت کامله! فعلاً لازم نیست 💚');
+      return;
+    }
+  }
+  else if(skin.ability === 'auto_solve'){
+    session.abilityUsed = true;
+    showToast('🔥 نفس آتش! سؤال حل شد!');
+    const correctBtn = allBtns[q.correctIndex];
+    onAnswer(q.correctIndex, correctBtn, { isAbility:true });
+    return;
+  }
+  renderAbilityBar();
+}
+
+function onAnswer(index, btnEl, evt){
+  if(session.locked) return;
+  session.locked = true;
+  clearInterval(timerHandle);
+  const q = session.currentQuestion;
+  const correct = index === q.correctIndex;
+  const allBtns = document.querySelectorAll('#options-grid .opt-btn');
+  allBtns.forEach(b => b.disabled = true);
+  if(correct){
+    sfx.correct();
+    btnEl.classList.add('correct');
+    session.combo += 1;
+    session.correctCount += 1;
+    session.stageCorrectCount += 1;
+    session.results[session.index] = 'correct';
+    const base = 10;
+    const comboMult = Math.min(session.combo, 5);
+    const gained = base * comboMult;
+    session.score += gained;
+    session.stageScore += gained;
+    if(session.combo % 2 === 0){
+      const coinGain = 1 * session.coinMultiplier;
+      session.coinsEarned += coinGain;
+      session.stageCoinsEarned += coinGain;
+    }
+    if(evt){
+      const rect = btnEl.getBoundingClientRect();
+      const particleEmoji = (evt.isAbility) ? '🔥' : pick(['✨','⭐','🌟']);
+      spawnParticles(rect.left+rect.width/2, rect.top, particleEmoji, 5);
+    }
+  } else {
+    sfx.wrong();
+    if(btnEl) btnEl.classList.add('wrong');
+    if(index >= 0 && allBtns[q.correctIndex]) allBtns[q.correctIndex].classList.add('correct');
+    else { allBtns.forEach((b,i)=>{ if(i===q.correctIndex) b.classList.add('correct'); }); }
+    session.combo = 0;
+    session.wrongCount += 1;
+    session.hearts -= 1;
+    session.results[session.index] = 'wrong';
+  }
+  renderGameHeader();
+  session.index += 1;
+  setTimeout(() => {
+    if(session.hearts <= 0){
+      sfx.gameover();
+      showScreen('screen-gameover');
+    } else {
+      nextQuestion();
+    }
+  }, correct ? 550 : 900);
+}
+
+function finishStage(){
+  clearInterval(timerHandle);
+  if(session.stage >= 3){
+    finishLevel();
+    return;
+  }
+  sfx.levelup();
+  const stageNum = session.stage;
+  document.getElementById('stage-result-title').textContent = `مرحله ${toFa(stageNum)} (${STAGE_LABELS[stageNum]}) تموم شد!`;
+  document.getElementById('stage-result-correct').textContent = toFa(session.stageCorrectCount) + '/' + toFa(STAGE_QUESTION_COUNT);
+  document.getElementById('stage-result-score').textContent = toFa(session.stageScore);
+  document.getElementById('stage-result-coins').textContent = toFa(session.stageCoinsEarned);
+  document.getElementById('stage-result-note').textContent = `مرحله بعدی (${STAGE_LABELS[stageNum+1]}) یه‌کم سخت‌تره، آماده‌ای؟`;
+  showScreen('screen-stage-result');
+}
+
+function finishLevel(){
+  clearInterval(timerHandle);
+  const lvl = session.level;
+  const ratio = session.correctCount / lvl.count;
+  const passed = ratio >= lvl.minPassRatio;
+  let stars = 0;
+  if(passed){
+    if(ratio >= 0.95) stars = 3;
+    else if(ratio >= 0.8) stars = 2;
+    else stars = 1;
+  }
+  const completionBonus = passed ? 5 * session.coinMultiplier : 0;
+  if(passed){
+    sfx.levelup();
+    save.coins += session.coinsEarned + completionBonus;
+    if(stars > (save.stars[lvl.id]||0)) save.stars[lvl.id] = stars;
+    if(lvl.id === save.unlocked && save.unlocked < 5) save.unlocked += 1;
+    writeSave();
+  } else {
+    save.coins += session.coinsEarned;
+    writeSave();
+  }
+  document.getElementById('result-emoji').textContent = passed ? '🎉' : '😅';
+  document.getElementById('result-title').textContent = passed ? 'سطح کامل شد!' : 'نزدیک بود! دوباره تلاش کن';
+  document.getElementById('result-stars').textContent = passed ? ('⭐'.repeat(stars) + '☆'.repeat(3-stars)) : '☆☆☆';
+  document.getElementById('result-correct').textContent = toFa(session.correctCount) + '/' + toFa(lvl.count);
+  document.getElementById('result-score').textContent = toFa(session.score);
+  document.getElementById('result-coins').textContent = toFa(session.coinsEarned + completionBonus);
+  const nextBtn = document.getElementById('btn-result-next');
+  nextBtn.style.display = (passed && lvl.id < 5) ? 'flex' : 'none';
+  nextBtn.textContent = passed && lvl.id < 5 ? `برو به سطح ${toFa(lvl.id+1)}` : 'سطح بعد';
+  const label = document.getElementById('btn-result-retry');
+  label.textContent = passed ? 'تلاش دوباره برای ستاره بیشتر' : 'تلاش دوباره';
+  showScreen('screen-result');
+}
+
+document.getElementById('btn-channel').addEventListener('click', () => {
+  sfx.tap();
+  window.open('https://eitaa.com/riazibabazi', '_blank');
+});
+document.getElementById('btn-game-home').addEventListener('click', () => {
+  sfx.tap();
+  clearInterval(timerHandle);
+  renderMenu();
+  showScreen('screen-menu');
+});
+document.getElementById('ability-btn').addEventListener('click', useAbility);
+document.getElementById('btn-shop').addEventListener('click', () => { sfx.tap(); renderShop(); showScreen('screen-shop'); });
+document.getElementById('btn-shop-back').addEventListener('click', () => { sfx.tap(); renderMenu(); showScreen('screen-menu'); });
+document.getElementById('btn-intro-back').addEventListener('click', () => { sfx.tap(); showScreen('screen-menu'); });
+document.getElementById('btn-start-level').addEventListener('click', () => {
+  sfx.tap();
+  const levelToStart = pendingLevel || 1;
+  startLevel(levelToStart);
+});
+document.getElementById('btn-stage-continue').addEventListener('click', () => {
+  sfx.tap();
+  session.stage += 1;
+  session.index = 0;
+  session.results = [];
+  session.stageCorrectCount = 0;
+  session.stageScore = 0;
+  session.stageCoinsEarned = 0;
+  renderGameHeader();
+  nextQuestion();
+  showScreen('screen-game');
+});
+document.getElementById('btn-stage-menu').addEventListener('click', () => {
+  sfx.tap();
+  clearInterval(timerHandle);
+  renderMenu();
+  showScreen('screen-menu');
+});
+document.getElementById('btn-result-next').addEventListener('click', () => {
+  sfx.tap();
+  const nid = session.level.id + 1;
+  if(nid <= 5) openIntro(nid); else { renderMenu(); showScreen('screen-menu'); }
+});
+document.getElementById('btn-result-retry').addEventListener('click', () => { sfx.tap(); startLevel(session.level.id); });
+document.getElementById('btn-result-menu').addEventListener('click', () => { sfx.tap(); renderMenu(); showScreen('screen-menu'); });
+document.getElementById('btn-over-retry').addEventListener('click', () => { sfx.tap(); startLevel(session.level.id); });
+document.getElementById('btn-over-menu').addEventListener('click', () => { sfx.tap(); renderMenu(); showScreen('screen-menu'); });
+
+function syncMusicButtons(){
+  const btns = document.querySelectorAll('.music-toggle');
+  btns.forEach(b => b.textContent = save.musicOn ? '🔊' : '🔇');
+}
+document.querySelectorAll('.music-toggle').forEach(btn => {
+  btn.addEventListener('click', () => {
+    save.musicOn = !save.musicOn;
+    writeSave();
+    applyMusicVolume();
+    syncMusicButtons();
+    ensureAudio();
+    tone(save.musicOn ? 660 : 330, 0.08, 'square', 0.08, 0);
+  });
+});
+
+(function starfield(){
+  const canvas = document.getElementById('stars-bg');
+  const ctx = canvas.getContext('2d');
+  function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  const stars = Array.from({length:70}, () => ({
+    x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+    r: Math.random()*1.6+0.4, tw: Math.random()*Math.PI*2, speed: Math.random()*0.02+0.01
+  }));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    stars.forEach(s => {
+      if(!reduceMotion) s.tw += s.speed;
+      const alpha = 0.4 + Math.sin(s.tw)*0.35;
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(255,255,255,${Math.max(0.1,alpha)})`;
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+syncMusicButtons();
+armMusicAutostart();
+renderMenu();
+})();
+</script>
+</body>
+</html>
