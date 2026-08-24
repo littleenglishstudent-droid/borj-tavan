@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.littleenglishstudent_droid.twa",
+        "sha256_cert_fingerprints": ["17:C8:8C:33:16:D2:E2:26:5E:A1:72:CB:C5:33:DA:5E:EF:7F:DB:59:11:05:02:26:3A:D3:A2:DC:9C:E6:1A:80"]
+      }
+    }]
