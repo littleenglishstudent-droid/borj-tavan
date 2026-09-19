@@ -3,8 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <link rel="manifest" href="manifest.json">
 <title>برج توان | تمرین توان و جذر</title>
+<script src="https://developer.eitaa.com/eitaa-web-app.js"></script>
+<script>
+  // اتصال به کیت توسعه ایتا (در صورت باز شدن بازی از داخل ایتا)
+  if (window.Eitaa && window.Eitaa.WebApp) {
+    window.Eitaa.WebApp.ready();
+    window.Eitaa.WebApp.expand();
+    window.Eitaa.WebApp.disableVerticalSwipes();
+  }
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -291,7 +299,7 @@
       <button class="btn btn-ghost btn-full" id="btn-shop">🎭 فروشگاه شخصیت</button>
     </div>
     <div class="menu-footer">
-      <button class="btn btn-channel btn-full" id="btn-channel">📣 بازی های بیشتر در کانال ریاضی بازی</button>
+      <button class="btn btn-channel btn-full" id="btn-channel">📣 عضویت در کانال ریاضی بازی</button>
     </div>
     <div class="credit-line">طراحی شده توسط ف.شیخانی</div>
   </section>
@@ -703,9 +711,18 @@ const SKINS = [
 
 const screens = {};
 document.querySelectorAll('.screen').forEach(s => screens[s.id] = s);
+let currentScreenId = 'screen-menu';
 function showScreen(id){
   Object.values(screens).forEach(s => s.classList.remove('active'));
   screens[id].classList.add('active');
+  currentScreenId = id;
+  if (window.Eitaa && window.Eitaa.WebApp && window.Eitaa.WebApp.BackButton) {
+    if (id === 'screen-menu') {
+      window.Eitaa.WebApp.BackButton.hide();
+    } else {
+      window.Eitaa.WebApp.BackButton.show();
+    }
+  }
 }
 
 function renderMenu(){
@@ -1363,6 +1380,27 @@ document.querySelectorAll('.music-toggle').forEach(btn => {
 syncMusicButtons();
 armMusicAutostart();
 renderMenu();
+
+// مدیریت دکمه بازگشت ایتا: هر صفحه، همون رفتار دکمه بازگشت داخلی خودش رو اجرا می‌کنه
+if (window.Eitaa && window.Eitaa.WebApp && window.Eitaa.WebApp.BackButton) {
+  const backTargets = {
+    'screen-shop': 'btn-shop-back',
+    'screen-intro': 'btn-intro-back',
+    'screen-game': 'btn-game-home',
+    'screen-stage-result': 'btn-stage-menu',
+    'screen-result': 'btn-result-menu',
+    'screen-gameover': 'btn-over-menu'
+  };
+  window.Eitaa.WebApp.BackButton.onClick(function(){
+    const targetBtnId = backTargets[currentScreenId];
+    if (targetBtnId) {
+      const btn = document.getElementById(targetBtnId);
+      if (btn) btn.click();
+    } else {
+      showScreen('screen-menu');
+    }
+  });
+}
 })();
 </script>
 </body>
