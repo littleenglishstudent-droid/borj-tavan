@@ -117,6 +117,7 @@
   @keyframes bob{ 0%,100%{transform:translateY(-58px);} 50%{transform:translateY(-64px);} }
   .menu-footer{ display:flex; gap:10px; margin-top:8px; }
   .menu-row{ display:flex; gap:10px; margin-top:8px; }
+  .menu-center{ flex:1; display:flex; flex-direction:column; justify-content:center; }
   .btn-half{ flex:1; font-size:13px; padding:12px 8px; position:relative; }
   .btn[disabled]{ opacity:.5; cursor:default; }
   .menu-badge{ position:absolute; top:-6px; left:-6px; background:var(--coral); color:#fff; font-size:10px; font-weight:800; border-radius:999px; padding:2px 6px; }
@@ -287,6 +288,14 @@
   .ach-title{ font-weight:800; font-size:14px; }
   .ach-desc{ font-size:12px; opacity:.8; margin-top:2px; }
   .ach-reward{ font-weight:800; color:var(--gold); font-size:13px; }
+  .prog-summary{ display:flex; gap:10px; margin-bottom:14px; }
+  .prog-list{ flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:12px; }
+  .prog-row{ background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:var(--radius-sm); padding:10px 12px; }
+  .prog-row-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; font-size:13px; font-weight:700; }
+  .prog-bar-track{ height:10px; border-radius:999px; background:rgba(255,255,255,.1); overflow:hidden; }
+  .prog-bar-fill{ height:100%; border-radius:999px; transition:width .4s ease; }
+  .prog-row-note{ font-size:11px; opacity:.7; margin-top:4px; }
+  .prog-tip{ background:rgba(255,193,69,.1); border:1px solid rgba(255,193,69,.3); border-radius:var(--radius-md); padding:12px 14px; font-size:13px; margin-top:10px; line-height:1.9; }
   .daily-wrap, .endless-wrap{ display:flex; flex-direction:column; flex:1; min-height:0; }
   .daily-info, .endless-info{ text-align:center; opacity:.85; font-size:13px; margin-bottom:10px; }
   .endless-score-pill{ display:flex; justify-content:center; gap:16px; margin-bottom:10px; }
@@ -322,24 +331,39 @@
       </div>
       <div class="coin-pill">🪙 <span id="coin-count" class="fa-num">۰</span></div>
     </div>
-    <div class="tower-wrap">
-      <div class="tower-path" id="tower-path"></div>
-    </div>
-    <div class="menu-row">
-      <button class="btn btn-ghost btn-half" id="btn-daily">🎯 چالش روزانه</button>
-      <button class="btn btn-ghost btn-half" id="btn-endless">♾️ بی‌پایان</button>
-    </div>
-    <div class="menu-row">
-      <button class="btn btn-ghost btn-half" id="btn-shop">🎭 فروشگاه</button>
-      <button class="btn btn-ghost btn-half" id="btn-achievements">🏅 دستاوردها</button>
-    </div>
-    <div class="menu-footer">
-      <button class="btn btn-ghost btn-full" id="btn-leaderboard">🏆 جدول رتبه‌بندی</button>
+    <div class="menu-center">
+      <div class="menu-footer">
+        <button class="btn btn-primary btn-full" id="btn-levels">🗼 شروع بازی / مسیر مراحل</button>
+      </div>
+      <div class="menu-row">
+        <button class="btn btn-ghost btn-half" id="btn-daily">🎯 چالش روزانه</button>
+        <button class="btn btn-ghost btn-half" id="btn-endless">♾️ بی‌پایان</button>
+      </div>
+      <div class="menu-row">
+        <button class="btn btn-ghost btn-half" id="btn-shop">🎭 فروشگاه</button>
+        <button class="btn btn-ghost btn-half" id="btn-achievements">🏅 دستاوردها</button>
+      </div>
+      <div class="menu-row">
+        <button class="btn btn-ghost btn-half" id="btn-progress">📊 گزارش پیشرفت</button>
+        <button class="btn btn-ghost btn-half" id="btn-leaderboard">🏆 رتبه‌بندی</button>
+      </div>
     </div>
     <div class="menu-footer">
       <button class="btn btn-channel btn-full" id="btn-channel">📣 عضویت در کانال ریاضی بازی</button>
     </div>
     <div class="credit-line">طراحی شده توسط ف.شیخانی</div>
+  </section>
+  <section class="screen" id="screen-levels">
+    <div class="topbar">
+      <div class="logo"><h2 style="font-size:18px;">🗼 مسیر مراحل</h2></div>
+      <div class="coin-pill">🪙 <span id="coin-count-levels" class="fa-num">۰</span></div>
+    </div>
+    <div class="tower-wrap">
+      <div class="tower-path" id="tower-path"></div>
+    </div>
+    <div class="menu-footer" style="margin-top:10px;">
+      <button class="btn btn-ghost btn-full" id="btn-levels-back">بازگشت</button>
+    </div>
   </section>
   <section class="screen" id="screen-shop">
     <div class="topbar">
@@ -389,6 +413,18 @@
     <div class="ach-list" id="achievements-list"></div>
     <div class="menu-footer" style="margin-top:10px;">
       <button class="btn btn-ghost btn-full" id="btn-achievements-back">بازگشت</button>
+    </div>
+  </section>
+  <section class="screen" id="screen-progress">
+    <div class="topbar">
+      <div class="logo"><h2 style="font-size:18px;">📊 گزارش پیشرفت</h2></div>
+      <div></div>
+    </div>
+    <div class="prog-summary" id="prog-summary"></div>
+    <div class="prog-list" id="prog-list"></div>
+    <div class="prog-tip" id="prog-tip"></div>
+    <div class="menu-footer" style="margin-top:10px;">
+      <button class="btn btn-ghost btn-full" id="btn-progress-back">بازگشت</button>
     </div>
   </section>
   <section class="screen" id="screen-daily">
@@ -658,7 +694,8 @@ function defaultSave(){
   return {
     unlocked:1, stars:{1:0,2:0,3:0,4:0,5:0}, coins:0, skin:0, owned:[0], musicOn:true,
     bestScore:{}, playerName:null,
-    stats:{ totalCorrect:0, totalAnswered:0, bestCombo:0 },
+    stats:{ totalCorrect:0, totalAnswered:0, bestCombo:0,
+      byLevel:{ 1:{correct:0,total:0}, 2:{correct:0,total:0}, 3:{correct:0,total:0}, 4:{correct:0,total:0}, 5:{correct:0,total:0} } },
     achievements:{},
     dailyStreak:0, lastDailyDate:null
   };
@@ -668,7 +705,11 @@ function loadSave(){
     const raw = localStorage.getItem(SAVE_KEY);
     if(!raw) return defaultSave();
     const parsed = JSON.parse(raw);
-    return Object.assign(defaultSave(), parsed);
+    const merged = Object.assign(defaultSave(), parsed);
+    // merge عمیق برای stats، چون ذخیره‌های قدیمی‌تر ممکنه byLevel رو نداشته باشن
+    merged.stats = Object.assign(defaultSave().stats, parsed.stats || {});
+    merged.stats.byLevel = Object.assign(defaultSave().stats.byLevel, (parsed.stats && parsed.stats.byLevel) || {});
+    return merged;
   }catch(e){ return defaultSave(); }
 }
 function writeSave(){
@@ -785,10 +826,16 @@ function checkAchievements(){
   });
   if(unlockedAny) writeSave();
 }
-function trackAnswerStat(correct){
+function trackAnswerStat(correct, levelId){
   save.stats.totalAnswered = (save.stats.totalAnswered||0) + 1;
   if(correct){
     save.stats.totalCorrect = (save.stats.totalCorrect||0) + 1;
+  }
+  if(levelId){
+    if(!save.stats.byLevel) save.stats.byLevel = {};
+    if(!save.stats.byLevel[levelId]) save.stats.byLevel[levelId] = {correct:0,total:0};
+    save.stats.byLevel[levelId].total += 1;
+    if(correct) save.stats.byLevel[levelId].correct += 1;
   }
 }
 function renderAchievements(){
@@ -807,6 +854,52 @@ function renderAchievements(){
       <div class="ach-reward fa-num">${unlocked ? '✔️' : '+'+toFa(a.reward)}</div>`;
     wrap.appendChild(row);
   });
+}
+
+function barColor(pct){
+  if(pct >= 80) return 'var(--teal)';
+  if(pct >= 50) return 'var(--gold)';
+  return 'var(--coral)';
+}
+function renderProgress(){
+  const byLevel = save.stats.byLevel || {};
+  const totalCorrect = save.stats.totalCorrect || 0;
+  const totalAnswered = save.stats.totalAnswered || 0;
+  const overallPct = totalAnswered > 0 ? Math.round((totalCorrect/totalAnswered)*100) : 0;
+
+  const summary = document.getElementById('prog-summary');
+  summary.innerHTML = `
+    <div class="stat-chip">کل سؤال‌ها<span class="fa-num">${toFa(totalAnswered)}</span></div>
+    <div class="stat-chip">درست<span class="fa-num">${toFa(totalCorrect)}</span></div>
+    <div class="stat-chip">درصد کلی<span class="fa-num">${toFa(overallPct)}%</span></div>`;
+
+  const list = document.getElementById('prog-list');
+  list.innerHTML = '';
+  let weakest = null, strongest = null;
+  LEVELS.forEach(lvl => {
+    const st = byLevel[lvl.id] || {correct:0,total:0};
+    const pct = st.total > 0 ? Math.round((st.correct/st.total)*100) : 0;
+    const row = document.createElement('div');
+    row.className = 'prog-row';
+    row.innerHTML = `
+      <div class="prog-row-head"><span>${lvl.emoji} ${lvl.short}</span><span class="fa-num">${toFa(pct)}%</span></div>
+      <div class="prog-bar-track"><div class="prog-bar-fill" style="width:${pct}%;background:${barColor(pct)};"></div></div>
+      <div class="prog-row-note">${st.total > 0 ? `${toFa(st.correct)} درست از ${toFa(st.total)} سؤال` : 'هنوز تمرین نکردی'}</div>`;
+    list.appendChild(row);
+    if(st.total >= 3){
+      if(!weakest || pct < weakest.pct) weakest = {lvl, pct};
+      if(!strongest || pct > strongest.pct) strongest = {lvl, pct};
+    }
+  });
+
+  const tip = document.getElementById('prog-tip');
+  if(!weakest){
+    tip.textContent = '💡 هنوز داده‌ی کافی نداری. چند تا سؤال تو هر سطح جواب بده تا نقاط قوت و ضعفت رو بهت نشون بدم!';
+  } else {
+    let msg = `💪 نقطه‌ی قوتت: «${strongest.lvl.short}» (${toFa(strongest.pct)}% درست)`;
+    msg += `<br>📌 بهتره بیشتر رو «${weakest.lvl.short}» تمرین کنی (${toFa(weakest.pct)}% درست)`;
+    tip.innerHTML = msg;
+  }
 }
 
 // ===================== چالش روزانه =====================
@@ -863,6 +956,7 @@ function nextDailyQuestion(){
   const stage = rand(1,3);
   const q = GENERATORS[lvlId](stage);
   dailyState.currentQuestion = q;
+  dailyState.currentLevelId = lvlId;
   document.getElementById('daily-question-card').style.display = 'block';
   document.getElementById('daily-question-text').innerHTML = q.prompt;
   document.getElementById('daily-question-sub').textContent = q.sub;
@@ -896,7 +990,7 @@ function onDailyAnswer(index, btnEl){
     allBtns.forEach((b,i) => { if(i === q.correctIndex) b.classList.add('correct'); });
     dailyState.results[dailyState.index] = 'wrong';
   }
-  trackAnswerStat(correct);
+  trackAnswerStat(correct, dailyState.currentLevelId);
   writeSave();
   dailyState.index += 1;
   setTimeout(nextDailyQuestion, correct ? 550 : 900);
@@ -1004,7 +1098,7 @@ function onEndlessAnswer(index, btnEl){
     const gained = 10 * Math.min(endlessState.combo, 5);
     endlessState.score += gained;
     if(save.stats && endlessState.combo > (save.stats.bestCombo||0)) save.stats.bestCombo = endlessState.combo;
-    trackAnswerStat(true);
+    trackAnswerStat(true, endlessState.lvlId);
     if(endlessState.correct % 6 === 0 && endlessState.lvlId < 5) endlessState.lvlId += 1;
     if(endlessState.timerMs > 6000) endlessState.timerMs -= 150;
   } else {
@@ -1014,7 +1108,7 @@ function onEndlessAnswer(index, btnEl){
     else allBtns.forEach((b,i) => { if(i === q.correctIndex) b.classList.add('correct'); });
     endlessState.combo = 0;
     endlessState.hearts -= 1;
-    trackAnswerStat(false);
+    trackAnswerStat(false, endlessState.lvlId);
   }
   writeSave();
   document.getElementById('endless-score').textContent = toFa(endlessState.score);
@@ -1322,6 +1416,8 @@ function showScreen(id){
 function renderMenu(){
   document.getElementById('coin-count').textContent = toFa(save.coins);
   document.getElementById('coin-count-2').textContent = toFa(save.coins);
+  const levelsCoin = document.getElementById('coin-count-levels');
+  if(levelsCoin) levelsCoin.textContent = toFa(save.coins);
   const path = document.getElementById('tower-path');
   path.innerHTML = '';
   LEVELS.forEach((lvl, idx) => {
@@ -1820,7 +1916,7 @@ function onAnswer(index, btnEl, evt){
       const particleEmoji = (evt.isAbility) ? '🔥' : pick(['✨','⭐','🌟']);
       spawnParticles(rect.left+rect.width/2, rect.top, particleEmoji, 5);
     }
-    trackAnswerStat(true);
+    trackAnswerStat(true, session.level.id);
     if(session.combo > (save.stats.bestCombo||0)) save.stats.bestCombo = session.combo;
   } else {
     sfx.wrong();
@@ -1831,7 +1927,7 @@ function onAnswer(index, btnEl, evt){
     session.wrongCount += 1;
     session.hearts -= 1;
     session.results[session.index] = 'wrong';
-    trackAnswerStat(false);
+    trackAnswerStat(false, session.level.id);
   }
   writeSave();
   checkAchievements();
@@ -1863,6 +1959,10 @@ function finishStage(){
   document.getElementById('stage-result-coins').textContent = toFa(session.stageCoinsEarned);
   document.getElementById('stage-result-note').textContent = `مرحله بعدی (${STAGE_LABELS[stageNum+1]}) یه‌کم سخت‌تره، آماده‌ای؟`;
   showScreen('screen-stage-result');
+  // بعد از هر مرحله‌ی داخلی (نه فقط پایان کامل سطح)، امتیاز تا همین‌جا رو هم ذخیره و تو جدول رتبه‌بندی ثبت می‌کنیم
+  save.coins += session.coinsEarned;
+  session.coinsEarned = 0;
+  recordScoreAndSubmit(session.level.id, session.score);
 }
 
 function finishLevel(){
@@ -1907,6 +2007,11 @@ document.getElementById('btn-channel').addEventListener('click', () => {
 document.getElementById('btn-game-home').addEventListener('click', () => {
   sfx.tap();
   clearInterval(timerHandle);
+  if(session && session.score > 0){
+    save.coins += session.coinsEarned;
+    recordScoreAndSubmit(session.level.id, session.score);
+    session.coinsEarned = 0;
+  }
   renderMenu();
   showScreen('screen-menu');
 });
@@ -1916,6 +2021,10 @@ document.getElementById('btn-leaderboard').addEventListener('click', () => { sfx
 document.getElementById('btn-leaderboard-back').addEventListener('click', () => { sfx.tap(); showScreen('screen-menu'); });
 document.getElementById('btn-achievements').addEventListener('click', () => { sfx.tap(); renderAchievements(); showScreen('screen-achievements'); });
 document.getElementById('btn-achievements-back').addEventListener('click', () => { sfx.tap(); showScreen('screen-menu'); });
+document.getElementById('btn-levels').addEventListener('click', () => { sfx.tap(); renderMenu(); showScreen('screen-levels'); });
+document.getElementById('btn-levels-back').addEventListener('click', () => { sfx.tap(); showScreen('screen-menu'); });
+document.getElementById('btn-progress').addEventListener('click', () => { sfx.tap(); renderProgress(); showScreen('screen-progress'); });
+document.getElementById('btn-progress-back').addEventListener('click', () => { sfx.tap(); showScreen('screen-menu'); });
 document.getElementById('btn-daily').addEventListener('click', () => { sfx.tap(); openDaily(); });
 document.getElementById('btn-daily-back').addEventListener('click', () => { sfx.tap(); renderMenu(); showScreen('screen-menu'); });
 document.getElementById('btn-endless').addEventListener('click', () => { sfx.tap(); openEndless(); });
@@ -1927,7 +2036,7 @@ document.getElementById('btn-name-save').addEventListener('click', () => { sfx.t
 document.getElementById('btn-name-cancel').addEventListener('click', () => { sfx.tap(); closeNameModal(); });
 document.getElementById('name-input').addEventListener('keydown', (e) => { if(e.key === 'Enter'){ confirmName(); } });
 document.getElementById('btn-shop-back').addEventListener('click', () => { sfx.tap(); renderMenu(); showScreen('screen-menu'); });
-document.getElementById('btn-intro-back').addEventListener('click', () => { sfx.tap(); showScreen('screen-menu'); });
+document.getElementById('btn-intro-back').addEventListener('click', () => { sfx.tap(); showScreen('screen-levels'); });
 document.getElementById('btn-start-level').addEventListener('click', () => {
   sfx.tap();
   const levelToStart = pendingLevel || 1;
@@ -1948,18 +2057,23 @@ document.getElementById('btn-stage-continue').addEventListener('click', () => {
 document.getElementById('btn-stage-menu').addEventListener('click', () => {
   sfx.tap();
   clearInterval(timerHandle);
+  if(session && session.score > 0){
+    save.coins += session.coinsEarned;
+    recordScoreAndSubmit(session.level.id, session.score);
+    session.coinsEarned = 0;
+  }
   renderMenu();
-  showScreen('screen-menu');
+  showScreen('screen-levels');
 });
 document.getElementById('btn-result-next').addEventListener('click', () => {
   sfx.tap();
   const nid = session.level.id + 1;
-  if(nid <= 5) openIntro(nid); else { renderMenu(); showScreen('screen-menu'); }
+  if(nid <= 5) openIntro(nid); else { renderMenu(); showScreen('screen-levels'); }
 });
 document.getElementById('btn-result-retry').addEventListener('click', () => { sfx.tap(); startLevel(session.level.id); });
-document.getElementById('btn-result-menu').addEventListener('click', () => { sfx.tap(); renderMenu(); showScreen('screen-menu'); });
+document.getElementById('btn-result-menu').addEventListener('click', () => { sfx.tap(); renderMenu(); showScreen('screen-levels'); });
 document.getElementById('btn-over-retry').addEventListener('click', () => { sfx.tap(); startLevel(session.level.id); });
-document.getElementById('btn-over-menu').addEventListener('click', () => { sfx.tap(); renderMenu(); showScreen('screen-menu'); });
+document.getElementById('btn-over-menu').addEventListener('click', () => { sfx.tap(); renderMenu(); showScreen('screen-levels'); });
 
 function syncMusicButtons(){
   const btns = document.querySelectorAll('.music-toggle');
@@ -2025,7 +2139,9 @@ if (window.Eitaa && window.Eitaa.WebApp && window.Eitaa.WebApp.BackButton) {
     'screen-achievements': 'btn-achievements-back',
     'screen-daily': 'btn-daily-back',
     'screen-endless': 'btn-endless-home',
-    'screen-endless-result': 'btn-endless-result-menu'
+    'screen-endless-result': 'btn-endless-result-menu',
+    'screen-levels': 'btn-levels-back',
+    'screen-progress': 'btn-progress-back'
   };
   window.Eitaa.WebApp.BackButton.onClick(function(){
     const targetBtnId = backTargets[currentScreenId];
