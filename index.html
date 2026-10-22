@@ -712,6 +712,16 @@ function submitTotalScoreToLeaderboard(){
     window.BorjLeaderboard.submit(save.playerName, score);
   }
 }
+// بعد از هر بازی (چه سطح تموم بشه چه جونش تموم بشه)، اگه امتیاز این بازی از رکورد قبلی
+// همون مرحله بیشتر بود، رکورد رو به‌روز و همیشه جدول رتبه‌بندی رو هم آپدیت می‌کنیم
+function recordScoreAndSubmit(levelId, score){
+  if(!save.bestScore) save.bestScore = {};
+  if(score > (save.bestScore[levelId]||0)){
+    save.bestScore[levelId] = score;
+  }
+  writeSave();
+  submitTotalScoreToLeaderboard();
+}
 async function loadLeaderboard(){
   const listEl = document.getElementById('leaderboard-list');
   document.getElementById('lb-me-name').textContent = save.playerName || '—';
@@ -1020,14 +1030,7 @@ function onEndlessAnswer(index, btnEl){
 function finishEndless(){
   clearInterval(endlessTimerHandle);
   sfx.gameover();
-  if(!save.bestScore) save.bestScore = {};
-  if(endlessState.score > (save.bestScore.endless||0)){
-    save.bestScore.endless = endlessState.score;
-    writeSave();
-    submitTotalScoreToLeaderboard();
-  } else {
-    writeSave();
-  }
+  recordScoreAndSubmit('endless', endlessState.score);
   checkAchievements();
   document.getElementById('endless-final-score').textContent = toFa(endlessState.score);
   document.getElementById('endless-best-score').textContent = toFa(save.bestScore.endless||0);
@@ -1837,6 +1840,8 @@ function onAnswer(index, btnEl, evt){
   setTimeout(() => {
     if(session.hearts <= 0){
       sfx.gameover();
+      save.coins += session.coinsEarned;
+      recordScoreAndSubmit(session.level.id, session.score);
       showScreen('screen-gameover');
     } else {
       nextQuestion();
@@ -1877,17 +1882,10 @@ function finishLevel(){
     save.coins += session.coinsEarned + completionBonus;
     if(stars > (save.stars[lvl.id]||0)) save.stars[lvl.id] = stars;
     if(lvl.id === save.unlocked && save.unlocked < 5) save.unlocked += 1;
-    if(session.score > (save.bestScore[lvl.id]||0)){
-      save.bestScore[lvl.id] = session.score;
-      writeSave();
-      submitTotalScoreToLeaderboard();
-    } else {
-      writeSave();
-    }
   } else {
     save.coins += session.coinsEarned;
-    writeSave();
   }
+  recordScoreAndSubmit(lvl.id, session.score);
   document.getElementById('result-emoji').textContent = passed ? '🎉' : '😅';
   document.getElementById('result-title').textContent = passed ? 'سطح کامل شد!' : 'نزدیک بود! دوباره تلاش کن';
   document.getElementById('result-stars').textContent = passed ? ('⭐'.repeat(stars) + '☆'.repeat(3-stars)) : '☆☆☆';
