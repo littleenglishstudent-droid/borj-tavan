@@ -116,6 +116,10 @@
   .avatar-flag{ position:absolute; font-size:28px; transform:translateY(-58px); animation:bob 1.6s ease-in-out infinite; }
   @keyframes bob{ 0%,100%{transform:translateY(-58px);} 50%{transform:translateY(-64px);} }
   .menu-footer{ display:flex; gap:10px; margin-top:8px; }
+  .menu-row{ display:flex; gap:10px; margin-top:8px; }
+  .btn-half{ flex:1; font-size:13px; padding:12px 8px; position:relative; }
+  .btn[disabled]{ opacity:.5; cursor:default; }
+  .menu-badge{ position:absolute; top:-6px; left:-6px; background:var(--coral); color:#fff; font-size:10px; font-weight:800; border-radius:999px; padding:2px 6px; }
   .btn{
     font-family:var(--font); border:none; cursor:pointer; border-radius:var(--radius-md);
     font-weight:800; font-size:15px; padding:14px 16px; display:flex; align-items:center; justify-content:center; gap:8px;
@@ -260,6 +264,32 @@
   .stat-chip span{ display:block; font-size:20px; margin-top:2px; }
   .actions-col{ display:flex; flex-direction:column; gap:10px; width:100%; margin-top:6px; }
   .fa-num{ font-feature-settings:"tnum"; }
+  .lb-me-card{ background:rgba(255,255,255,.07); border:1px solid rgba(255,193,69,.35); border-radius:var(--radius-md); padding:12px 14px; margin-bottom:12px; }
+  .lb-me-row{ display:flex; align-items:center; justify-content:space-between; }
+  .lb-list{ flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding-bottom:6px; }
+  .lb-row{ display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:var(--radius-sm); padding:9px 12px; }
+  .lb-rank{ width:28px; text-align:center; font-weight:800; opacity:.85; }
+  .lb-row.lb-top1 .lb-rank{ color:#FFD24C; }
+  .lb-row.lb-top2 .lb-rank{ color:#D8DEE9; }
+  .lb-row.lb-top3 .lb-rank{ color:#E0A36B; }
+  .lb-name{ flex:1; font-weight:700; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .lb-score{ font-weight:800; color:var(--gold); font-size:14px; }
+  .lb-row.lb-me{ border-color:var(--teal); background:rgba(61,220,151,.12); }
+  .modal-overlay{ position:fixed; inset:0; background:rgba(10,6,25,.72); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; }
+  .modal-overlay.active{ display:flex; }
+  .modal-box{ background:var(--bg-deep-2); border:1px solid rgba(255,255,255,.14); border-radius:var(--radius-lg); padding:20px; width:100%; max-width:380px; text-align:center; }
+  .modal-box input{ width:100%; padding:12px; border-radius:var(--radius-md); border:none; font-family:var(--font); font-size:16px; text-align:center; margin:4px 0 14px; background:#fff; color:#170F2E; }
+  .ach-list{ flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding-bottom:6px; }
+  .ach-row{ display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:var(--radius-sm); padding:10px 12px; opacity:.6; }
+  .ach-row.ach-unlocked{ opacity:1; border-color:rgba(255,193,69,.4); background:rgba(255,193,69,.08); }
+  .ach-icon{ font-size:24px; width:32px; text-align:center; }
+  .ach-text{ flex:1; }
+  .ach-title{ font-weight:800; font-size:14px; }
+  .ach-desc{ font-size:12px; opacity:.8; margin-top:2px; }
+  .ach-reward{ font-weight:800; color:var(--gold); font-size:13px; }
+  .daily-wrap, .endless-wrap{ display:flex; flex-direction:column; flex:1; min-height:0; }
+  .daily-info, .endless-info{ text-align:center; opacity:.85; font-size:13px; margin-bottom:10px; }
+  .endless-score-pill{ display:flex; justify-content:center; gap:16px; margin-bottom:10px; }
   @media (max-height:700px){
     .screen{ padding:10px 14px 8px; }
     .question-card{ padding:14px 12px; min-height:60px; }
@@ -295,8 +325,16 @@
     <div class="tower-wrap">
       <div class="tower-path" id="tower-path"></div>
     </div>
+    <div class="menu-row">
+      <button class="btn btn-ghost btn-half" id="btn-daily">🎯 چالش روزانه</button>
+      <button class="btn btn-ghost btn-half" id="btn-endless">♾️ بی‌پایان</button>
+    </div>
+    <div class="menu-row">
+      <button class="btn btn-ghost btn-half" id="btn-shop">🎭 فروشگاه</button>
+      <button class="btn btn-ghost btn-half" id="btn-achievements">🏅 دستاوردها</button>
+    </div>
     <div class="menu-footer">
-      <button class="btn btn-ghost btn-full" id="btn-shop">🎭 فروشگاه شخصیت</button>
+      <button class="btn btn-ghost btn-full" id="btn-leaderboard">🏆 جدول رتبه‌بندی</button>
     </div>
     <div class="menu-footer">
       <button class="btn btn-channel btn-full" id="btn-channel">📣 عضویت در کانال ریاضی بازی</button>
@@ -316,6 +354,118 @@
       <button class="btn btn-ghost btn-full" id="btn-shop-back">بازگشت</button>
     </div>
   </section>
+  <section class="screen" id="screen-leaderboard">
+    <div class="topbar">
+      <div class="logo">
+        <h2 style="font-size:18px;">🏆 جدول رتبه‌بندی</h2>
+      </div>
+      <div></div>
+    </div>
+    <div class="lb-me-card" id="lb-me-card">
+      <div class="lb-me-row">
+        <div>
+          <div style="font-size:12px;opacity:.75;">نام تو</div>
+          <div id="lb-me-name" style="font-weight:700;font-size:16px;">—</div>
+        </div>
+        <button class="btn btn-ghost" id="btn-lb-edit-name" style="padding:8px 14px;font-size:13px;">ویرایش نام</button>
+      </div>
+      <div class="lb-me-row" style="margin-top:8px;">
+        <div style="font-size:12px;opacity:.75;">امتیاز کل تو</div>
+        <div id="lb-me-score" class="fa-num" style="font-weight:800;font-size:18px;color:var(--gold);">۰</div>
+      </div>
+    </div>
+    <div class="lb-list" id="leaderboard-list">
+      <div style="text-align:center;opacity:.75;padding:20px;">در حال بارگذاری...</div>
+    </div>
+    <div class="menu-footer" style="margin-top:10px;">
+      <button class="btn btn-ghost btn-full" id="btn-leaderboard-back">بازگشت</button>
+    </div>
+  </section>
+  <section class="screen" id="screen-achievements">
+    <div class="topbar">
+      <div class="logo"><h2 style="font-size:18px;">🏅 دستاوردها</h2></div>
+      <div></div>
+    </div>
+    <div class="ach-list" id="achievements-list"></div>
+    <div class="menu-footer" style="margin-top:10px;">
+      <button class="btn btn-ghost btn-full" id="btn-achievements-back">بازگشت</button>
+    </div>
+  </section>
+  <section class="screen" id="screen-daily">
+    <div class="topbar">
+      <div class="logo"><h2 style="font-size:18px;">🎯 چالش روزانه</h2></div>
+      <div class="coin-pill">🪙 <span id="coin-count-daily" class="fa-num">۰</span></div>
+    </div>
+    <div class="daily-wrap">
+      <div class="daily-info" id="daily-info">۵ سؤال، هر روز یک بار. درست جواب بده و سکه جایزه بگیر!</div>
+      <div class="progress-dots" id="daily-dots"></div>
+      <div class="question-card" id="daily-question-card" style="display:none;">
+        <div>
+          <div class="question-text" id="daily-question-text"></div>
+          <span class="question-sub" id="daily-question-sub"></span>
+        </div>
+      </div>
+      <div class="options-grid" id="daily-options-grid"></div>
+      <div class="result-wrap" id="daily-result" style="display:none;">
+        <div style="font-size:48px;" id="daily-result-emoji">🎉</div>
+        <h2 id="daily-result-title">آفرین!</h2>
+        <div class="stat-row">
+          <div class="stat-chip">درست<span class="fa-num" id="daily-result-correct">۰</span></div>
+          <div class="stat-chip">سکه<span class="fa-num" id="daily-result-coins">۰</span></div>
+          <div class="stat-chip">روزهای پیاپی<span class="fa-num" id="daily-result-streak">۰</span></div>
+        </div>
+      </div>
+      <div style="text-align:center;padding:30px;opacity:.75;" id="daily-done-note" style="display:none;"></div>
+    </div>
+    <div class="menu-footer" style="margin-top:10px;">
+      <button class="btn btn-ghost btn-full" id="btn-daily-back">بازگشت</button>
+    </div>
+  </section>
+  <section class="screen" id="screen-endless">
+    <div class="game-header">
+      <div class="header-right">
+        <button class="icon-btn" id="btn-endless-home" title="بازگشت">🏠</button>
+        <div class="hearts" id="endless-hearts-row"></div>
+      </div>
+      <div></div>
+      <div class="header-right">
+        <div class="coin-pill">امتیاز <span id="endless-score" class="fa-num" style="margin-right:4px;">۰</span></div>
+      </div>
+    </div>
+    <div class="endless-wrap">
+      <div class="timer-track"><div class="timer-fill" id="endless-timer-fill"></div></div>
+      <div class="question-card">
+        <div>
+          <div class="question-text" id="endless-question-text">—</div>
+          <span class="question-sub" id="endless-question-sub"></span>
+        </div>
+      </div>
+      <div class="options-grid" id="endless-options-grid"></div>
+    </div>
+  </section>
+  <section class="screen" id="screen-endless-result">
+    <div class="result-wrap">
+      <div style="font-size:54px;">♾️</div>
+      <h2>بازی تموم شد!</h2>
+      <div class="stat-row">
+        <div class="stat-chip">امتیاز<span class="fa-num" id="endless-final-score">۰</span></div>
+        <div class="stat-chip">رکورد تو<span class="fa-num" id="endless-best-score">۰</span></div>
+      </div>
+    </div>
+    <div class="actions-col">
+      <button class="btn btn-primary btn-full" id="btn-endless-retry">دوباره بازی کن</button>
+      <button class="btn btn-ghost btn-full" id="btn-endless-result-menu">بازگشت به منو</button>
+    </div>
+  </section>
+  <div class="modal-overlay" id="name-modal">
+    <div class="modal-box">
+      <h3 style="margin:0 0 6px;">اسمت رو برای جدول رتبه‌بندی وارد کن</h3>
+      <p style="font-size:13px;opacity:.8;margin:0 0 10px;">این اسم کنار امتیازت تو جدول نشون داده می‌شه</p>
+      <input type="text" id="name-input" maxlength="20" placeholder="مثلا: علی">
+      <button class="btn btn-primary btn-full" id="btn-name-save">ثبت نام</button>
+      <button class="btn btn-ghost btn-full" id="btn-name-cancel" style="margin-top:8px;">انصراف</button>
+    </div>
+  </div>
   <section class="screen" id="screen-intro">
     <div class="topbar">
       <div class="logo">
@@ -412,6 +562,64 @@
     </div>
   </section>
 </div>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, addDoc, doc, setDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDFVFaTqBUKVjzl_GDA3kaDZZahxNBnkkg",
+    authDomain: "riazi-bazi-games.firebaseapp.com",
+    projectId: "riazi-bazi-games",
+    storageBucket: "riazi-bazi-games.firebasestorage.app",
+    messagingSenderId: "37921871245",
+    appId: "1:37921871245:web:0df8631f6abb6c7b3fd9c4",
+    measurementId: "G-T7L4CBFQ4F"
+  };
+  const fbApp = initializeApp(firebaseConfig);
+  const db = getFirestore(fbApp);
+  const LB_COLLECTION = "leaderboard_borjtavan";
+  const USERS_COLLECTION = "users_borjtavan";
+
+  function getEitaaUser(){
+    try{
+      const wa = window.Eitaa && window.Eitaa.WebApp;
+      const u = wa && wa.initDataUnsafe && wa.initDataUnsafe.user;
+      if(u && u.id) return u;
+    }catch(e){}
+    return null;
+  }
+
+  window.BorjLeaderboard = {
+    async submit(name, score){
+      try{
+        await addDoc(collection(db, LB_COLLECTION), { name: String(name).slice(0,20), score: Math.max(0, Math.round(score)), ts: Date.now() });
+        return true;
+      }catch(e){ console.error("leaderboard submit failed", e); return false; }
+    },
+    async fetchTop(n){
+      try{
+        const q = query(collection(db, LB_COLLECTION), orderBy("score", "desc"), limit(n || 20));
+        const snap = await getDocs(q);
+        return snap.docs.map(d => d.data());
+      }catch(e){ console.error("leaderboard fetch failed", e); return null; }
+    },
+    async registerUser(name){
+      const u = getEitaaUser();
+      if(!u) return false;
+      try{
+        await setDoc(doc(db, USERS_COLLECTION, String(u.id)), {
+          eitaaId: String(u.id),
+          username: u.username || null,
+          firstName: u.first_name || null,
+          lastName: u.last_name || null,
+          playerName: name ? String(name).slice(0,20) : null,
+          lastSeen: Date.now()
+        }, { merge: true });
+        return true;
+      }catch(e){ console.error("registerUser failed", e); return false; }
+    }
+  };
+</script>
 <script>
 (function(){
 "use strict";
@@ -428,7 +636,13 @@ function shuffle(arr){
 }
 const SAVE_KEY = 'borjTavan_save_v1';
 function defaultSave(){
-  return { unlocked:1, stars:{1:0,2:0,3:0,4:0,5:0}, coins:0, skin:0, owned:[0], musicOn:true };
+  return {
+    unlocked:1, stars:{1:0,2:0,3:0,4:0,5:0}, coins:0, skin:0, owned:[0], musicOn:true,
+    bestScore:{}, playerName:null,
+    stats:{ totalCorrect:0, totalAnswered:0, bestCombo:0 },
+    achievements:{},
+    dailyStreak:0, lastDailyDate:null
+  };
 }
 function loadSave(){
   try{
@@ -442,6 +656,362 @@ function writeSave(){
   try{ localStorage.setItem(SAVE_KEY, JSON.stringify(save)); }catch(e){}
 }
 let save = loadSave();
+
+function totalScore(){
+  return Object.values(save.bestScore).reduce((a,b) => a + (b||0), 0);
+}
+
+let pendingAfterName = null;
+function openNameModal(afterSave){
+  pendingAfterName = afterSave || null;
+  const input = document.getElementById('name-input');
+  input.value = save.playerName || '';
+  document.getElementById('name-modal').classList.add('active');
+  setTimeout(() => input.focus(), 50);
+}
+function closeNameModal(){
+  document.getElementById('name-modal').classList.remove('active');
+  pendingAfterName = null;
+}
+function confirmName(){
+  const input = document.getElementById('name-input');
+  const name = input.value.trim();
+  if(!name){ input.focus(); return; }
+  save.playerName = name.slice(0,20);
+  writeSave();
+  if(window.BorjLeaderboard) window.BorjLeaderboard.registerUser(save.playerName);
+  const cb = pendingAfterName;
+  closeNameModal();
+  if(cb) cb();
+}
+function submitTotalScoreToLeaderboard(){
+  if(!window.BorjLeaderboard) return;
+  const score = totalScore();
+  if(!save.playerName){
+    openNameModal(() => { window.BorjLeaderboard.submit(save.playerName, totalScore()); });
+  } else {
+    window.BorjLeaderboard.submit(save.playerName, score);
+  }
+}
+async function loadLeaderboard(){
+  const listEl = document.getElementById('leaderboard-list');
+  document.getElementById('lb-me-name').textContent = save.playerName || '—';
+  document.getElementById('lb-me-score').textContent = toFa(totalScore());
+  if(!window.BorjLeaderboard){
+    listEl.innerHTML = '<div style="text-align:center;opacity:.75;padding:20px;">جدول رتبه‌بندی در دسترس نیست</div>';
+    return;
+  }
+  listEl.innerHTML = '<div style="text-align:center;opacity:.75;padding:20px;">در حال بارگذاری...</div>';
+  const rows = await window.BorjLeaderboard.fetchTop(20);
+  if(rows === null){
+    listEl.innerHTML = '<div style="text-align:center;opacity:.75;padding:20px;">خطا در دریافت اطلاعات. دوباره تلاش کن</div>';
+    return;
+  }
+  if(rows.length === 0){
+    listEl.innerHTML = '<div style="text-align:center;opacity:.75;padding:20px;">هنوز کسی تو جدول نیست. اولین نفر باش!</div>';
+    return;
+  }
+  listEl.innerHTML = '';
+  rows.forEach((r, i) => {
+    const row = document.createElement('div');
+    const rank = i+1;
+    row.className = 'lb-row' + (rank<=3 ? ' lb-top'+rank : '') + (save.playerName && r.name === save.playerName ? ' lb-me' : '');
+    const medal = rank===1 ? '🥇' : rank===2 ? '🥈' : rank===3 ? '🥉' : toFa(rank);
+    row.innerHTML = `<div class="lb-rank">${medal}</div><div class="lb-name"></div><div class="lb-score fa-num">${toFa(r.score||0)}</div>`;
+    row.querySelector('.lb-name').textContent = r.name || '—';
+    listEl.appendChild(row);
+  });
+}
+
+// ===================== آمار و دستاوردها =====================
+const ACHIEVEMENTS = [
+  { id:'first_star', title:'اولین قدم', desc:'یه مرحله رو با حداقل ۱ ستاره تموم کن', icon:'🥉', reward:5,
+    check: s => Object.values(s.stars).some(v => v >= 1) },
+  { id:'all_pass', title:'فاتح برج', desc:'هر ۵ مرحله رو حداقل یک بار رد کن', icon:'🗼', reward:15,
+    check: s => Object.values(s.stars).filter(v => v >= 1).length >= 5 },
+  { id:'all_stars', title:'ستاره‌ی کامل', desc:'هر ۵ مرحله رو با ۳ ستاره تموم کن', icon:'🌟', reward:25,
+    check: s => Object.values(s.stars).filter(v => v >= 3).length >= 5 },
+  { id:'combo5', title:'آتیش‌پاره', desc:'تو یه بازی، ۵ سؤال رو پشت‌سرهم درست جواب بده', icon:'🔥', reward:10,
+    check: s => (s.stats.bestCombo||0) >= 5 },
+  { id:'correct50', title:'ریاضی‌دان نوپا', desc:'مجموعاً ۵۰ سؤال رو درست جواب بده', icon:'📘', reward:10,
+    check: s => (s.stats.totalCorrect||0) >= 50 },
+  { id:'correct200', title:'استاد توان و جذر', desc:'مجموعاً ۲۰۰ سؤال رو درست جواب بده', icon:'🎓', reward:30,
+    check: s => (s.stats.totalCorrect||0) >= 200 },
+  { id:'daily3', title:'پشتکار روزانه', desc:'۳ روز پشت‌سرهم چالش روزانه رو انجام بده', icon:'📅', reward:15,
+    check: s => (s.dailyStreak||0) >= 3 },
+  { id:'endless300', title:'بی‌پایان‌خور', desc:'تو حالت بی‌پایان به امتیاز ۳۰۰ برس', icon:'♾️', reward:20,
+    check: s => ((s.bestScore && s.bestScore.endless)||0) >= 300 }
+];
+function checkAchievements(){
+  let unlockedAny = false;
+  ACHIEVEMENTS.forEach(a => {
+    if(!save.achievements[a.id] && a.check(save)){
+      save.achievements[a.id] = true;
+      save.coins += a.reward;
+      unlockedAny = true;
+      showToast(`${a.icon} دستاورد جدید: ${a.title} (+${toFa(a.reward)} سکه)`);
+    }
+  });
+  if(unlockedAny) writeSave();
+}
+function trackAnswerStat(correct){
+  save.stats.totalAnswered = (save.stats.totalAnswered||0) + 1;
+  if(correct){
+    save.stats.totalCorrect = (save.stats.totalCorrect||0) + 1;
+  }
+}
+function renderAchievements(){
+  const wrap = document.getElementById('achievements-list');
+  wrap.innerHTML = '';
+  ACHIEVEMENTS.forEach(a => {
+    const unlocked = !!save.achievements[a.id];
+    const row = document.createElement('div');
+    row.className = 'ach-row' + (unlocked ? ' ach-unlocked' : '');
+    row.innerHTML = `
+      <div class="ach-icon">${unlocked ? a.icon : '🔒'}</div>
+      <div class="ach-text">
+        <div class="ach-title">${a.title}</div>
+        <div class="ach-desc">${a.desc}</div>
+      </div>
+      <div class="ach-reward fa-num">${unlocked ? '✔️' : '+'+toFa(a.reward)}</div>`;
+    wrap.appendChild(row);
+  });
+}
+
+// ===================== چالش روزانه =====================
+function todayKey(){
+  const d = new Date();
+  return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+}
+function dateKeyMinusDays(n){
+  const d = new Date();
+  d.setDate(d.getDate()-n);
+  return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate();
+}
+let dailyState = null;
+function openDaily(){
+  if(save.lastDailyDate === todayKey()){
+    document.getElementById('daily-question-card').style.display = 'none';
+    document.getElementById('daily-options-grid').innerHTML = '';
+    document.getElementById('daily-dots').innerHTML = '';
+    document.getElementById('daily-result').style.display = 'none';
+    document.getElementById('daily-info').style.display = 'none';
+    const note = document.getElementById('daily-done-note');
+    note.style.display = 'block';
+    note.textContent = '✅ چالش امروز رو انجام دادی! فردا دوباره سر بزن.';
+    showScreen('screen-daily');
+    return;
+  }
+  document.getElementById('daily-info').style.display = 'block';
+  document.getElementById('daily-result').style.display = 'none';
+  document.getElementById('daily-done-note').style.display = 'none';
+  document.getElementById('coin-count-daily').textContent = toFa(save.coins);
+  dailyState = { index:0, total:5, correct:0, coinsEarned:0, locked:false };
+  nextDailyQuestion();
+  showScreen('screen-daily');
+}
+function renderDailyDots(){
+  const wrap = document.getElementById('daily-dots');
+  wrap.innerHTML = '';
+  for(let i=0;i<dailyState.total;i++){
+    const d = document.createElement('div');
+    let cls = 'dot';
+    if(i < dailyState.index) cls += (dailyState.results && dailyState.results[i] === 'wrong') ? ' wrong' : ' correct';
+    if(i === dailyState.index) cls += ' current';
+    d.className = cls;
+    wrap.appendChild(d);
+  }
+}
+function nextDailyQuestion(){
+  if(dailyState.index >= dailyState.total){
+    finishDaily();
+    return;
+  }
+  dailyState.locked = false;
+  const lvlId = rand(1,5);
+  const stage = rand(1,3);
+  const q = GENERATORS[lvlId](stage);
+  dailyState.currentQuestion = q;
+  document.getElementById('daily-question-card').style.display = 'block';
+  document.getElementById('daily-question-text').innerHTML = q.prompt;
+  document.getElementById('daily-question-sub').textContent = q.sub;
+  const grid = document.getElementById('daily-options-grid');
+  grid.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.innerHTML = opt;
+    btn.addEventListener('click', () => onDailyAnswer(i, btn));
+    grid.appendChild(btn);
+  });
+  renderDailyDots();
+}
+function onDailyAnswer(index, btnEl){
+  if(dailyState.locked) return;
+  dailyState.locked = true;
+  const q = dailyState.currentQuestion;
+  const correct = index === q.correctIndex;
+  const allBtns = document.querySelectorAll('#daily-options-grid .opt-btn');
+  allBtns.forEach(b => b.disabled = true);
+  if(!dailyState.results) dailyState.results = [];
+  if(correct){
+    sfx.correct();
+    btnEl.classList.add('correct');
+    dailyState.correct += 1;
+    dailyState.results[dailyState.index] = 'correct';
+  } else {
+    sfx.wrong();
+    btnEl.classList.add('wrong');
+    allBtns.forEach((b,i) => { if(i === q.correctIndex) b.classList.add('correct'); });
+    dailyState.results[dailyState.index] = 'wrong';
+  }
+  trackAnswerStat(correct);
+  writeSave();
+  dailyState.index += 1;
+  setTimeout(nextDailyQuestion, correct ? 550 : 900);
+}
+function finishDaily(){
+  const coinsReward = 5 + dailyState.correct * 2;
+  save.coins += coinsReward;
+  const yesterday = dateKeyMinusDays(1);
+  save.dailyStreak = (save.lastDailyDate === yesterday) ? (save.dailyStreak||0) + 1 : 1;
+  save.lastDailyDate = todayKey();
+  writeSave();
+  checkAchievements();
+  document.getElementById('daily-question-card').style.display = 'none';
+  document.getElementById('daily-options-grid').innerHTML = '';
+  document.getElementById('daily-dots').innerHTML = '';
+  document.getElementById('daily-info').style.display = 'none';
+  const res = document.getElementById('daily-result');
+  res.style.display = 'flex';
+  const passed = dailyState.correct >= 3;
+  document.getElementById('daily-result-emoji').textContent = passed ? '🎉' : '🙂';
+  document.getElementById('daily-result-title').textContent = passed ? 'آفرین، خیلی خوب بود!' : 'فردا بهتر میشی!';
+  document.getElementById('daily-result-correct').textContent = toFa(dailyState.correct) + '/' + toFa(dailyState.total);
+  document.getElementById('daily-result-coins').textContent = toFa(coinsReward);
+  document.getElementById('daily-result-streak').textContent = toFa(save.dailyStreak);
+  document.getElementById('coin-count-daily').textContent = toFa(save.coins);
+}
+
+// ===================== حالت بی‌پایان =====================
+let endlessState = null;
+let endlessTimerHandle = null;
+function openEndless(){
+  const unlocked = Object.values(save.stars).filter(v => v >= 1).length >= 5;
+  if(!unlocked){
+    showToast('اول هر ۵ مرحله رو حداقل یک بار رد کن تا بی‌پایان باز بشه 🔒');
+    return;
+  }
+  ensureAudio();
+  endlessState = { lvlId:1, correct:0, combo:0, score:0, hearts:3, locked:false, timerMs:11000 };
+  renderEndlessHearts();
+  document.getElementById('endless-score').textContent = toFa(0);
+  nextEndlessQuestion();
+  showScreen('screen-endless');
+}
+function renderEndlessHearts(){
+  const row = document.getElementById('endless-hearts-row');
+  row.innerHTML = '';
+  for(let i=0;i<3;i++){
+    const span = document.createElement('span');
+    span.className = 'heart' + (i < endlessState.hearts ? '' : ' lost');
+    span.textContent = '❤️';
+    row.appendChild(span);
+  }
+}
+function nextEndlessQuestion(){
+  endlessState.locked = false;
+  const stage = rand(1,3);
+  const q = GENERATORS[endlessState.lvlId](stage);
+  endlessState.currentQuestion = q;
+  document.getElementById('endless-question-text').innerHTML = q.prompt;
+  document.getElementById('endless-question-sub').textContent = q.sub;
+  const grid = document.getElementById('endless-options-grid');
+  grid.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.innerHTML = opt;
+    btn.addEventListener('click', () => onEndlessAnswer(i, btn));
+    grid.appendChild(btn);
+  });
+  startEndlessTimer();
+}
+function startEndlessTimer(){
+  clearInterval(endlessTimerHandle);
+  const totalMs = Math.max(5000, endlessState.timerMs);
+  const startTs = Date.now();
+  const fill = document.getElementById('endless-timer-fill');
+  fill.style.transition = 'none';
+  fill.style.width = '100%';
+  fill.style.background = 'linear-gradient(90deg, var(--teal), var(--gold))';
+  requestAnimationFrame(() => { fill.style.transition = 'width .1s linear, background .3s'; });
+  endlessTimerHandle = setInterval(() => {
+    const elapsed = Date.now() - startTs;
+    const pct = Math.max(0, 1 - elapsed/totalMs);
+    fill.style.width = (pct*100) + '%';
+    if(pct < 0.3) fill.style.background = 'linear-gradient(90deg, var(--coral), var(--gold))';
+    if(pct <= 0){
+      clearInterval(endlessTimerHandle);
+      if(!endlessState.locked) onEndlessAnswer(-1, null);
+    }
+  }, 50);
+}
+function onEndlessAnswer(index, btnEl){
+  if(endlessState.locked) return;
+  endlessState.locked = true;
+  clearInterval(endlessTimerHandle);
+  const q = endlessState.currentQuestion;
+  const correct = index === q.correctIndex;
+  const allBtns = document.querySelectorAll('#endless-options-grid .opt-btn');
+  allBtns.forEach(b => b.disabled = true);
+  if(correct){
+    sfx.correct();
+    if(btnEl) btnEl.classList.add('correct');
+    endlessState.combo += 1;
+    endlessState.correct += 1;
+    const gained = 10 * Math.min(endlessState.combo, 5);
+    endlessState.score += gained;
+    if(save.stats && endlessState.combo > (save.stats.bestCombo||0)) save.stats.bestCombo = endlessState.combo;
+    trackAnswerStat(true);
+    if(endlessState.correct % 6 === 0 && endlessState.lvlId < 5) endlessState.lvlId += 1;
+    if(endlessState.timerMs > 6000) endlessState.timerMs -= 150;
+  } else {
+    sfx.wrong();
+    if(btnEl) btnEl.classList.add('wrong');
+    if(index >= 0 && allBtns[q.correctIndex]) allBtns[q.correctIndex].classList.add('correct');
+    else allBtns.forEach((b,i) => { if(i === q.correctIndex) b.classList.add('correct'); });
+    endlessState.combo = 0;
+    endlessState.hearts -= 1;
+    trackAnswerStat(false);
+  }
+  writeSave();
+  document.getElementById('endless-score').textContent = toFa(endlessState.score);
+  renderEndlessHearts();
+  setTimeout(() => {
+    if(endlessState.hearts <= 0){
+      finishEndless();
+    } else {
+      nextEndlessQuestion();
+    }
+  }, correct ? 450 : 850);
+}
+function finishEndless(){
+  clearInterval(endlessTimerHandle);
+  sfx.gameover();
+  if(!save.bestScore) save.bestScore = {};
+  if(endlessState.score > (save.bestScore.endless||0)){
+    save.bestScore.endless = endlessState.score;
+    writeSave();
+    submitTotalScoreToLeaderboard();
+  } else {
+    writeSave();
+  }
+  checkAchievements();
+  document.getElementById('endless-final-score').textContent = toFa(endlessState.score);
+  document.getElementById('endless-best-score').textContent = toFa(save.bestScore.endless||0);
+  showScreen('screen-endless-result');
+}
 
 let audioCtx = null;
 function ensureAudio(){ if(!audioCtx){ try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } }
@@ -751,6 +1321,16 @@ function renderMenu(){
     else { node.appendChild(label); node.appendChild(btn); }
     path.appendChild(node);
   });
+  const dailyBtn = document.getElementById('btn-daily');
+  if(dailyBtn){
+    const done = save.lastDailyDate === todayKey();
+    dailyBtn.innerHTML = done ? '✅ چالش امروز انجام شد' : '🎯 چالش روزانه';
+  }
+  const endlessBtn = document.getElementById('btn-endless');
+  if(endlessBtn){
+    const unlocked = Object.values(save.stars).filter(v => v >= 1).length >= 5;
+    endlessBtn.innerHTML = unlocked ? '♾️ بی‌پایان' : '🔒 بی‌پایان';
+  }
 }
 
 function renderShop(){
@@ -1216,6 +1796,8 @@ function onAnswer(index, btnEl, evt){
       const particleEmoji = (evt.isAbility) ? '🔥' : pick(['✨','⭐','🌟']);
       spawnParticles(rect.left+rect.width/2, rect.top, particleEmoji, 5);
     }
+    trackAnswerStat(true);
+    if(session.combo > (save.stats.bestCombo||0)) save.stats.bestCombo = session.combo;
   } else {
     sfx.wrong();
     if(btnEl) btnEl.classList.add('wrong');
@@ -1225,7 +1807,10 @@ function onAnswer(index, btnEl, evt){
     session.wrongCount += 1;
     session.hearts -= 1;
     session.results[session.index] = 'wrong';
+    trackAnswerStat(false);
   }
+  writeSave();
+  checkAchievements();
   renderGameHeader();
   session.index += 1;
   setTimeout(() => {
@@ -1271,7 +1856,13 @@ function finishLevel(){
     save.coins += session.coinsEarned + completionBonus;
     if(stars > (save.stars[lvl.id]||0)) save.stars[lvl.id] = stars;
     if(lvl.id === save.unlocked && save.unlocked < 5) save.unlocked += 1;
-    writeSave();
+    if(session.score > (save.bestScore[lvl.id]||0)){
+      save.bestScore[lvl.id] = session.score;
+      writeSave();
+      submitTotalScoreToLeaderboard();
+    } else {
+      writeSave();
+    }
   } else {
     save.coins += session.coinsEarned;
     writeSave();
@@ -1302,6 +1893,20 @@ document.getElementById('btn-game-home').addEventListener('click', () => {
 });
 document.getElementById('ability-btn').addEventListener('click', useAbility);
 document.getElementById('btn-shop').addEventListener('click', () => { sfx.tap(); renderShop(); showScreen('screen-shop'); });
+document.getElementById('btn-leaderboard').addEventListener('click', () => { sfx.tap(); showScreen('screen-leaderboard'); loadLeaderboard(); });
+document.getElementById('btn-leaderboard-back').addEventListener('click', () => { sfx.tap(); showScreen('screen-menu'); });
+document.getElementById('btn-achievements').addEventListener('click', () => { sfx.tap(); renderAchievements(); showScreen('screen-achievements'); });
+document.getElementById('btn-achievements-back').addEventListener('click', () => { sfx.tap(); showScreen('screen-menu'); });
+document.getElementById('btn-daily').addEventListener('click', () => { sfx.tap(); openDaily(); });
+document.getElementById('btn-daily-back').addEventListener('click', () => { sfx.tap(); renderMenu(); showScreen('screen-menu'); });
+document.getElementById('btn-endless').addEventListener('click', () => { sfx.tap(); openEndless(); });
+document.getElementById('btn-endless-home').addEventListener('click', () => { sfx.tap(); clearInterval(endlessTimerHandle); renderMenu(); showScreen('screen-menu'); });
+document.getElementById('btn-endless-retry').addEventListener('click', () => { sfx.tap(); openEndless(); });
+document.getElementById('btn-endless-result-menu').addEventListener('click', () => { sfx.tap(); renderMenu(); showScreen('screen-menu'); });
+document.getElementById('btn-lb-edit-name').addEventListener('click', () => { sfx.tap(); openNameModal(() => { submitTotalScoreToLeaderboard(); loadLeaderboard(); }); });
+document.getElementById('btn-name-save').addEventListener('click', () => { sfx.tap(); confirmName(); });
+document.getElementById('btn-name-cancel').addEventListener('click', () => { sfx.tap(); closeNameModal(); });
+document.getElementById('name-input').addEventListener('keydown', (e) => { if(e.key === 'Enter'){ confirmName(); } });
 document.getElementById('btn-shop-back').addEventListener('click', () => { sfx.tap(); renderMenu(); showScreen('screen-menu'); });
 document.getElementById('btn-intro-back').addEventListener('click', () => { sfx.tap(); showScreen('screen-menu'); });
 document.getElementById('btn-start-level').addEventListener('click', () => {
@@ -1381,6 +1986,13 @@ syncMusicButtons();
 armMusicAutostart();
 renderMenu();
 
+// همون اول بازی، اگه بازیکن قبلاً اسمی وارد نکرده، اسمش رو برای جدول رتبه‌بندی می‌پرسیم
+if(!save.playerName){
+  setTimeout(() => { openNameModal(() => { submitTotalScoreToLeaderboard(); }); }, 400);
+} else if(window.BorjLeaderboard){
+  setTimeout(() => { window.BorjLeaderboard.registerUser(save.playerName); }, 400);
+}
+
 // مدیریت دکمه بازگشت ایتا: هر صفحه، همون رفتار دکمه بازگشت داخلی خودش رو اجرا می‌کنه
 if (window.Eitaa && window.Eitaa.WebApp && window.Eitaa.WebApp.BackButton) {
   const backTargets = {
@@ -1389,7 +2001,12 @@ if (window.Eitaa && window.Eitaa.WebApp && window.Eitaa.WebApp.BackButton) {
     'screen-game': 'btn-game-home',
     'screen-stage-result': 'btn-stage-menu',
     'screen-result': 'btn-result-menu',
-    'screen-gameover': 'btn-over-menu'
+    'screen-gameover': 'btn-over-menu',
+    'screen-leaderboard': 'btn-leaderboard-back',
+    'screen-achievements': 'btn-achievements-back',
+    'screen-daily': 'btn-daily-back',
+    'screen-endless': 'btn-endless-home',
+    'screen-endless-result': 'btn-endless-result-menu'
   };
   window.Eitaa.WebApp.BackButton.onClick(function(){
     const targetBtnId = backTargets[currentScreenId];
