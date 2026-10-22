@@ -589,10 +589,18 @@
     return null;
   }
 
+  const myUser = getEitaaUser();
+
   window.BorjLeaderboard = {
+    myEitaaId: myUser ? String(myUser.id) : null,
     async submit(name, score){
       try{
-        await addDoc(collection(db, LB_COLLECTION), { name: String(name).slice(0,20), score: Math.max(0, Math.round(score)), ts: Date.now() });
+        await addDoc(collection(db, LB_COLLECTION), {
+          name: String(name).slice(0,20),
+          score: Math.max(0, Math.round(score)),
+          eitaaId: myUser ? String(myUser.id) : null,
+          ts: Date.now()
+        });
         return true;
       }catch(e){ console.error("leaderboard submit failed", e); return false; }
     },
@@ -634,7 +642,18 @@ function shuffle(arr){
   for(let i=a.length-1;i>0;i--){ const j = rand(0,i); [a[i],a[j]]=[a[j],a[i]]; }
   return a;
 }
-const SAVE_KEY = 'borjTavan_save_v1';
+// آیدی ایتای کاربر رو می‌گیریم (اگه بازی از داخل ایتا باز شده باشه) تا هر حساب ایتا
+// روی همون گوشی، ذخیره‌سازی و اسم جدا از حساب‌های دیگه داشته باشه
+function getEitaaUserId(){
+  try{
+    const wa = window.Eitaa && window.Eitaa.WebApp;
+    const u = wa && wa.initDataUnsafe && wa.initDataUnsafe.user;
+    if(u && u.id) return String(u.id);
+  }catch(e){}
+  return null;
+}
+const EITAA_UID = getEitaaUserId();
+const SAVE_KEY = 'borjTavan_save_v1' + (EITAA_UID ? ('_' + EITAA_UID) : '');
 function defaultSave(){
   return {
     unlocked:1, stars:{1:0,2:0,3:0,4:0,5:0}, coins:0, skin:0, owned:[0], musicOn:true,
@@ -715,7 +734,9 @@ async function loadLeaderboard(){
   rows.forEach((r, i) => {
     const row = document.createElement('div');
     const rank = i+1;
-    row.className = 'lb-row' + (rank<=3 ? ' lb-top'+rank : '') + (save.playerName && r.name === save.playerName ? ' lb-me' : '');
+    const myId = window.BorjLeaderboard && window.BorjLeaderboard.myEitaaId;
+    const isMe = myId ? (r.eitaaId === myId) : (save.playerName && r.name === save.playerName);
+    row.className = 'lb-row' + (rank<=3 ? ' lb-top'+rank : '') + (isMe ? ' lb-me' : '');
     const medal = rank===1 ? '🥇' : rank===2 ? '🥈' : rank===3 ? '🥉' : toFa(rank);
     row.innerHTML = `<div class="lb-rank">${medal}</div><div class="lb-name"></div><div class="lb-score fa-num">${toFa(r.score||0)}</div>`;
     row.querySelector('.lb-name').textContent = r.name || '—';
